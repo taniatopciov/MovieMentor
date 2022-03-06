@@ -1,0 +1,43 @@
+@use '@angular/material' as mat;
+@include mat.core();
+
+$MovieMentorWebApp-primary: mat.define-palette(mat.$indigo-palette);
+$MovieMentorWebApp-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+
+$MovieMentorWebApp-warn: mat.define-palette(mat.$red-palette);
+
+$MovieMentorWebApp-theme: mat.define-light-theme((
+  color: (
+    primary: $MovieMentorWebApp-primary,
+    accent: $MovieMentorWebApp-accent,
+    warn: $MovieMentorWebApp-warn,
+  )
+));
+
+@include mat.all-component-themes($MovieMentorWebApp-theme);
+
+@import "~@angular/material/theming";
+
+@include mat-core();
+
+$moviementor-light-primary: mat-palette($mat-yellow, 800, 500, 900);
+$moviementor-light-accent: mat-palette($mat-deep-orange, 700, 500, 900);
+$moviementor-light-warn: mat-palette($mat-red);
+$moviementor-light-theme: mat-light-theme($moviementor-light-primary, $moviementor-light-accent, $moviementor-light-warn);
+
+$moviementor-dark-primary: mat-palette($mat-yellow, 800, 500, 900);
+$moviementor-dark-accent: mat-palette($mat-deep-orange, 500, 300, 700);
+$moviementor-dark-warn: mat-palette($mat-red);
+$moviementor-dark-theme: mat-dark-theme($moviementor-dark-primary, $moviementor-dark-accent, $moviementor-dark-warn);
+
+@include angular-material-theme($moviementor-light-theme);
+
+.dark-theme-mode {
+  @include angular-material-theme($moviementor-dark-theme);
+}
+
+:root {
+  --primary-color: #{mat-color($moviementor-light-primary)};
+  --accent-color: #{mat-color($moviementor-light-accent)};
+  --warn-color : #{mat-color($moviementor-light-warn)};
+};
