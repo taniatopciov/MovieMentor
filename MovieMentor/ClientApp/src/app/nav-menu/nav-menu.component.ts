@@ -1,18 +1,25 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {ThemeService} from "../services/theme-service/theme.service";
+import {OverlayContainer} from "@angular/cdk/overlay";
 
 @Component({
   selector: 'app-nav-menu',
   templateUrl: './nav-menu.component.html',
-  styleUrls: ['./nav-menu.component.css']
+  styleUrls: ['./nav-menu.component.scss']
 })
-export class NavMenuComponent {
-  isExpanded = false;
+export class NavMenuComponent implements OnInit {
 
-  collapse() {
-    this.isExpanded = false;
+  constructor(public themeService: ThemeService, private overlayContainer: OverlayContainer) {
   }
 
-  toggle() {
-    this.isExpanded = !this.isExpanded;
+  ngOnInit() {
+    this.themeService.darkThemeSubject.subscribe(darkMode => {
+      const darkClassName = 'dark-theme-mode';
+      if (darkMode) {
+        this.overlayContainer.getContainerElement().classList.add(darkClassName);
+      } else {
+        this.overlayContainer.getContainerElement().classList.remove(darkClassName);
+      }
+    });
   }
 }
