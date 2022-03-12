@@ -26,6 +26,10 @@
       <Folder Include="ClientApp\src\app\services\theme-service" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\MovieMentorCore\MovieMentorCore.csproj" />
+    </ItemGroup>
+
     <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
         <!-- Ensure Node.js is installed -->
         <Exec Command="node --version" ContinueOnError="true">
