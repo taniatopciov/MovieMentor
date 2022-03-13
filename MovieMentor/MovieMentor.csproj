@@ -24,6 +24,7 @@
 
     <ItemGroup>
       <Folder Include="ClientApp\src\app\services\theme-service" />
+      <Folder Include="ClientApp\src\app\shared" />
     </ItemGroup>
 
     <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

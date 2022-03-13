@@ -1,7 +1,70 @@
 <div class="project-details-main-div">
   <mat-card>
     <mat-stepper class="stp" labelPosition="bottom" linear #stepper>
+      <mat-step>
+        <ng-template matStepLabel>Genre</ng-template>
+        <single-selection-list [listData]="yearListOptions" (updateSelectedListItem)="onUpdateSelectedYear($event)"></single-selection-list>
+        <div>
+          <button mat-raised-button color="primary" matStepperNext>Next</button>
+        </div>
+      </mat-step>
 
+      <mat-step>
+        <ng-template matStepLabel>Director</ng-template>
+        <multiple-selection-list></multiple-selection-list>
+        <div>
+          <button mat-raised-button color="primary" matStepperPrevious>Back</button>
+          <button mat-raised-button color="primary" matStepperNext>Next</button>
+        </div>
+      </mat-step>
+
+      <mat-step>
+        <ng-template matStepLabel>Cast</ng-template>
+        <div>
+          <button mat-raised-button color="primary" matStepperPrevious>Back</button>
+          <button mat-raised-button color="primary" matStepperNext>Next</button>
+        </div>
+      </mat-step>
+
+      <mat-step>
+        <ng-template matStepLabel>Duration</ng-template>
+        <div>
+          <button mat-raised-button color="primary" matStepperPrevious>Back</button>
+          <button mat-raised-button color="primary" matStepperNext>Next</button>
+        </div>
+      </mat-step>
+
+      <mat-step>
+        <ng-template matStepLabel>Year</ng-template>
+        <single-selection-list [listData]="yearListOptions" (updateSelectedListItem)="onUpdateSelectedYear($event)"></single-selection-list>
+        <div>
+          <button mat-raised-button color="primary" matStepperPrevious>Back</button>
+          <button mat-raised-button color="primary" matStepperNext>Next</button>
+        </div>
+      </mat-step>
+
+      <mat-step>
+        <ng-template matStepLabel>Awards</ng-template>
+        <div>
+          <button mat-raised-button color="primary" matStepperPrevious>Back</button>
+          <button mat-raised-button color="primary" matStepperNext>Next</button>
+        </div>
+      </mat-step>
+
+      <mat-step>
+        <ng-template matStepLabel>Country of origin</ng-template>
+        <div>
+          <button mat-raised-button color="primary" matStepperPrevious>Back</button>
+          <button mat-raised-button color="primary" matStepperNext>Next</button>
+        </div>
+      </mat-step>
+
+      <mat-step>
+        <ng-template matStepLabel>Get recommendation</ng-template>
+        <div>
+          <button mat-raised-button color="primary" matStepperPrevious>Back</button>
+        </div>
+      </mat-step>
     </mat-stepper>
   </mat-card>
 </div>

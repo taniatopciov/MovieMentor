@@ -19,12 +19,16 @@ import {MatInputModule} from '@angular/material/input';
 import {MatCardModule} from '@angular/material/card';
 import {MatListModule} from '@angular/material/list';
 import {MatRadioModule} from '@angular/material/radio';
+import { MultipleSelectionListComponent } from './shared/multiple-selection-list/multiple-selection-list.component';
+import { SingleSelectionListComponent } from './shared/single-selection-list/single-selection-list.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavMenuComponent,
-    HomeComponent
+    HomeComponent,
+    MultipleSelectionListComponent,
+    SingleSelectionListComponent
   ],
   imports: [
     BrowserModule.withServerTransition({appId: 'ng-cli-universal'}),
