@@ -1,45 +1,34 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {MoviesService} from "../services/movies-service/movies.service";
+import Tag from "../services/movies-service/tag";
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
 
-  genreListOptions: string[] = ['Comedy', 'Drama', 'Action', 'Romance', 'Animation'];
-  directorListOptions: string[] = ['Christopher Nolan', 'Steven Spielberg', 'Quentin Tarantino', 'Martin Scorsese', 'David Fincher'];
-  castListOptions: string[] = ['Adam Sandler', 'Angelina Jolie', 'Alicia Vikander', 'Kit Harrington', 'Zendaya'];
-  durationListOptions: string[] = ['short (< 90 min)', 'medium (90 min - 120 min)', 'long ( > 120 min)'];
-  yearListOptions: string[] = ['2022', '2020-2021', 'Last 5 years', 'Last 10 Years', '2000s'];
-  awardsListOptions: string[] = ['Best Picture', 'Best Director', 'Best Actor', 'Best Actress', 'Best Screenplay'];
-  countryOfOriginListOptions: string[] = ['America', 'Romania', 'Germany', 'France', 'Spain'];
+  tags: Tag[] = [];
+  options = new Map<string, string[]>();
 
-  onUpdateSelectedGenres(selectedItems: string[]) {
-    console.log(selectedItems);
+  constructor(private moviesService: MoviesService) {
   }
 
-  onUpdateSelectedDirectors(selectedItems: string[]) {
-    console.log(selectedItems);
+  ngOnInit() {
+    this.moviesService.getTags().subscribe(data => {
+      this.tags = data;
+      console.log(this.tags.length);
+    })
   }
 
-  onUpdateSelectedCast(selectedItems: string[]) {
-    console.log(selectedItems);
+  onUpdateSelectedMultipleItems(tagName: string, selectedItems: string[]) {
+    // console.log(tagName + selectedItems);
+    this.options.set(tagName, selectedItems);
   }
 
-  onUpdateSelectedDuration(selectedItem: string) {
-    console.log(selectedItem);
-  }
-
-  onUpdateSelectedYear(selectedItem: string) {
-    console.log(selectedItem);
-  }
-
-  onUpdateSelectedAwards(selectedItems: string[]) {
-    console.log(selectedItems);
-  }
-
-  onUpdateSelectedCountries(selectedItems: string[]) {
-    console.log(selectedItems);
+  onUpdateSelectedSingleItem(tagName: string, selectedItem: string) {
+    // console.log(tagName + selectedItem);
+    this.options.set(tagName, [selectedItem]);
   }
 }

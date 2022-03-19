@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<IKnowledgeBaseLoader, KnowledgeBaseLoader>();
+builder.Services.AddTransient<IInferenceMachineService, InferenceMachineService>();
 
 var app = builder.Build();
 
