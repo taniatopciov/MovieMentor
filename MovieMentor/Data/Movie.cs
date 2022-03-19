@@ -8,7 +8,7 @@ public class Movie
 
     public ICollection<Genre> Genres { get; set; }
 
-    public Director Director { get; set; }
+    public ICollection<Director> Directors { get; set; }
 
     public ICollection<Actor> Actors { get; set; }
     
