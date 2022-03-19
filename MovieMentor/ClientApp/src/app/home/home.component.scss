@@ -1,0 +1,53 @@
+.mat-stepper-horizontal {
+  margin-top: 8px;
+}
+
+.mat-form-field {
+  margin-top: 16px;
+}
+
+.project-details-main-div {
+  width: 100%;
+  flex-direction: column;
+  box-sizing: border-box;
+  display: flex;
+  place-content: center space-around;
+  align-items: center;
+  overflow: auto;
+}
+
+.mat-card {
+  width: 80%;
+  height: 70vh;
+  margin-top: 4%;
+  margin-bottom: 4%;
+  flex-direction: row;
+  box-sizing: border-box;
+  display: flex;
+  place-content: center flex-start;
+  align-items: center;
+}
+
+.stp {
+  width: 100%;
+  height: 100%;
+}
+
+.example-radio-group {
+  display: flex;
+  flex-direction: column;
+  margin: 15px 0;
+}
+
+.example-radio-button {
+  margin: 5px;
+}
+
+.back-button {
+  margin-right: 8px;
+  margin-top: 16px;
+}
+
+.next-button {
+  margin-top: 16px;
+}

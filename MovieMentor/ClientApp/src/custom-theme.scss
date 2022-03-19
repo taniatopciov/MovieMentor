@@ -20,13 +20,13 @@ $MovieMentorWebApp-theme: mat.define-light-theme((
 
 @include mat-core();
 
-$moviementor-light-primary: mat-palette($mat-yellow, 800, 500, 900);
-$moviementor-light-accent: mat-palette($mat-deep-orange, 700, 500, 900);
+$moviementor-light-primary: mat-palette($mat-pink, 900, 500, 900);
+$moviementor-light-accent: mat-palette($mat-amber, A400, 500, 900);
 $moviementor-light-warn: mat-palette($mat-red);
 $moviementor-light-theme: mat-light-theme($moviementor-light-primary, $moviementor-light-accent, $moviementor-light-warn);
 
-$moviementor-dark-primary: mat-palette($mat-yellow, 800, 500, 900);
-$moviementor-dark-accent: mat-palette($mat-deep-orange, 500, 300, 700);
+$moviementor-dark-primary: mat-palette($mat-pink, 900, 500, 900);
+$moviementor-dark-accent: mat-palette($mat-amber, A400, 300, 700);
 $moviementor-dark-warn: mat-palette($mat-red);
 $moviementor-dark-theme: mat-dark-theme($moviementor-dark-primary, $moviementor-dark-accent, $moviementor-dark-warn);
 

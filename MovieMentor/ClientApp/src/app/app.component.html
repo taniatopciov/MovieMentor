@@ -1,6 +1,4 @@
-<body style="min-height: 100vh" [ngClass]="{'dark-theme-mode':themeService.isDarkTheme, 'mat-app-background': true}">
+<div style="min-height: 100vh" [ngClass]="{'dark-theme-mode':themeService.isDarkTheme, 'mat-app-background': true}">
   <app-nav-menu></app-nav-menu>
-  <div class="container">
-    <router-outlet></router-outlet>
-  </div>
-</body>
+  <router-outlet style="width: 100%"></router-outlet>
+</div>

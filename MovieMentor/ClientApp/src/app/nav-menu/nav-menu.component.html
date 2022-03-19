@@ -1,10 +1,11 @@
 <div class="mat-app-background">
-  <mat-toolbar color="primary">
-    <div fxLayout="row" fxLayoutAlign="start center">
+  <mat-toolbar style="min-height:72px" color="primary">
+    <div fxLayout="row" fxLayoutAlign="space-around center" fxFlex>
+      <img class="logo" src="../../assets/images/logo.png" alt="logo"/>
       <span class="nav-bar-text">Movie Mentor</span>
     </div>
     <span class="example-spacer"></span>
-    <mat-slide-toggle [(ngModel)]="themeService.isDarkTheme" labelPosition="before">
+    <mat-slide-toggle class="theme-toggle" [(ngModel)]="themeService.isDarkTheme" labelPosition="before">
       <mat-icon>bedtime</mat-icon>
     </mat-slide-toggle>
   </mat-toolbar>

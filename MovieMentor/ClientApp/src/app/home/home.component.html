@@ -1,1 +1,75 @@
-<h1>Welcome to Movie Mentor</h1>
+<div class="project-details-main-div">
+  <mat-card>
+    <mat-stepper class="stp" labelPosition="bottom" linear #stepper>
+      <mat-step>
+        <ng-template matStepLabel>Genre</ng-template>
+        <multiple-selection-list [listData]="genreListOptions" (updateSelectedListItem)="onUpdateSelectedGenres($event)"></multiple-selection-list>
+        <div>
+          <button class="next-button" mat-raised-button color="primary" matStepperNext>Next</button>
+        </div>
+      </mat-step>
+
+      <mat-step>
+        <ng-template matStepLabel>Director</ng-template>
+        <multiple-selection-list [listData]="directorListOptions" (updateSelectedListItem)="onUpdateSelectedDirectors($event)"></multiple-selection-list>
+        <div>
+          <button class="back-button" mat-raised-button color="primary" matStepperPrevious>Back</button>
+          <button class="next-button" mat-raised-button color="primary" matStepperNext>Next</button>
+        </div>
+      </mat-step>
+
+      <mat-step>
+        <ng-template matStepLabel>Cast</ng-template>
+        <multiple-selection-list [listData]="castListOptions" (updateSelectedListItem)="onUpdateSelectedCast($event)"></multiple-selection-list>
+        <div>
+          <button class="back-button" mat-raised-button color="primary" matStepperPrevious>Back</button>
+          <button class="next-button" mat-raised-button color="primary" matStepperNext>Next</button>
+        </div>
+      </mat-step>
+
+      <mat-step>
+        <ng-template matStepLabel>Duration</ng-template>
+        <single-selection-list [listData]="durationListOptions" (updateSelectedListItem)="onUpdateSelectedDuration($event)"></single-selection-list>
+        <div>
+          <button class="back-button" mat-raised-button color="primary" matStepperPrevious>Back</button>
+          <button class="next-button" mat-raised-button color="primary" matStepperNext>Next</button>
+        </div>
+      </mat-step>
+
+      <mat-step>
+        <ng-template matStepLabel>Year</ng-template>
+        <single-selection-list [listData]="yearListOptions" (updateSelectedListItem)="onUpdateSelectedYear($event)"></single-selection-list>
+        <div>
+          <button class="back-button" mat-raised-button color="primary" matStepperPrevious>Back</button>
+          <button class="next-button" mat-raised-button color="primary" matStepperNext>Next</button>
+        </div>
+      </mat-step>
+
+      <mat-step>
+        <ng-template matStepLabel>Awards</ng-template>
+        <multiple-selection-list [listData]="awardsListOptions" (updateSelectedListItem)="onUpdateSelectedAwards($event)"></multiple-selection-list>
+        <div>
+          <button class="back-button" mat-raised-button color="primary" matStepperPrevious>Back</button>
+          <button class="next-button" mat-raised-button color="primary" matStepperNext>Next</button>
+        </div>
+      </mat-step>
+
+      <mat-step>
+        <ng-template matStepLabel>Country of origin</ng-template>
+        <multiple-selection-list [listData]="countryOfOriginListOptions" (updateSelectedListItem)="onUpdateSelectedCountries($event)"></multiple-selection-list>
+        <div>
+          <button class="back-button" mat-raised-button color="primary" matStepperPrevious>Back</button>
+          <button class="next-button" mat-raised-button color="primary" matStepperNext>Next</button>
+        </div>
+      </mat-step>
+
+      <mat-step>
+        <ng-template matStepLabel>Get recommendation</ng-template>
+        <div>
+          <button class="back-button" mat-raised-button color="primary" matStepperPrevious>Back</button>
+        </div>
+      </mat-step>
+    </mat-stepper>
+  </mat-card>
+</div>
+
