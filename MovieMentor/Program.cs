@@ -17,7 +17,8 @@ builder.Services.AddDbContext<MovieContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddSingleton<IKnowledgeBaseLoader, KnowledgeBaseLoader>();
+builder.Services.AddScoped<IMoviesService, MoviesService>();
+builder.Services.AddScoped<IKnowledgeBaseLoader, KnowledgeBaseLoader>();
 builder.Services.AddTransient<IInferenceMachineService, InferenceMachineService>();
 
 var app = builder.Build();
@@ -48,7 +49,7 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<MovieContext>();
-        DbInitializer.Initialize(context);
+        await DbInitializer.Initialize(context);
     }
     catch (Exception e)
     {
