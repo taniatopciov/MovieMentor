@@ -4,10 +4,10 @@ namespace MovieMentor.DAL;
 
 public static class DbInitializer
 {
-    public static void Initialize(MovieContext context)
+    public static async Task Initialize(MovieContext context)
     {
-        // context.Database.EnsureDeleted();
-        context.Database.EnsureCreated();
+        // await context.Database.EnsureDeletedAsync();
+        await context.Database.EnsureCreatedAsync();
 
         if (context.Movies.Any())
         {
@@ -32,7 +32,7 @@ public static class DbInitializer
             context.Countries.Add(country);
         }
 
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
 
         var action = new Genre { Name = "Action" };
@@ -53,7 +53,7 @@ public static class DbInitializer
             context.Genres.Add(genre);
         }
 
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         var nolan = new Director { Name = "Christopher Nolan" };
         var watts = new Director { Name = "Jon Watts" };
@@ -73,7 +73,7 @@ public static class DbInitializer
             context.Directors.Add(director);
         }
 
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         var bestCinematography = new Award { Name = "Best Cinematography" };
         var bestAnimatedFilm = new Award { Name = "Best Animated Film" };
@@ -87,7 +87,7 @@ public static class DbInitializer
             context.Awards.Add(award);
         }
 
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         var bale = new Actor { Name = "Christian Bale", Country = uk };
         var freeman = new Actor { Name = "Morgan Freeman", Country = usa };
@@ -109,7 +109,7 @@ public static class DbInitializer
             context.Actors.Add(actor);
         }
 
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
 
         var movies = new List<Movie>
@@ -122,7 +122,7 @@ public static class DbInitializer
                 Country = usa,
                 Directors = new List<Director> { nolan },
                 Duration = 140,
-                Rating = 8.3,
+                Rating = "8.3",
                 Year = 2005,
                 Genres = new List<Genre> { action, thriller },
             },
@@ -134,7 +134,7 @@ public static class DbInitializer
                 Country = usa,
                 Directors = new List<Director> { howard, bush },
                 Duration = 109,
-                Rating = 7.3,
+                Rating = "7.3",
                 Year = 2021,
                 Genres = new List<Genre> { comedy, animated },
             },
@@ -146,7 +146,7 @@ public static class DbInitializer
                 Country = romania,
                 Directors = new List<Director>(),
                 Duration = 400,
-                Rating = 8.1,
+                Rating = "8.1",
                 Year = 2020,
                 Genres = new List<Genre> { action, comedy },
             },
@@ -157,6 +157,81 @@ public static class DbInitializer
             context.Movies.Add(movie);
         }
 
-        context.SaveChanges();
+        await context.SaveChangesAsync();
+
+        // init tags
+        // var tags = new List<Tag>
+        // {
+        //     new()
+        //     {
+        //         Name = "Genre",
+        //         SourceName = "Genres",
+        //         SourceType = SourceType.Database,
+        //         FieldName = nameof(Genre.Name),
+        //         ValueType = ValueType.Multiple,
+        //     },
+        //     new()
+        //     {
+        //         Name = "Directors",
+        //         SourceName = "Directors",
+        //         SourceType = SourceType.Database,
+        //         FieldName = nameof(Director.Name),
+        //         ValueType = ValueType.Multiple,
+        //     },
+        //     new()
+        //     {
+        //         Name = "Actors",
+        //         SourceName = "Actors",
+        //         SourceType = SourceType.Database,
+        //         FieldName = nameof(Actor.Name),
+        //         ValueType = ValueType.Multiple,
+        //     },
+        //     new()
+        //     {
+        //         Name = "Duration",
+        //         SourceName = "Duration",
+        //         SourceType = SourceType.Rule,
+        //         FieldName = nameof(Genre.Name), // todo
+        //         ValueType = ValueType.Single,
+        //     },
+        //     new()
+        //     {
+        //         Name = "Rating",
+        //         SourceName = "Rating",
+        //         SourceType = SourceType.Rule,
+        //         FieldName = nameof(Genre.Name), // todo
+        //         ValueType = ValueType.Single,
+        //     },
+        //     new()
+        //     {
+        //         Name = "Year",
+        //         SourceName = "Year",
+        //         SourceType = SourceType.Rule,
+        //         FieldName = nameof(Genre.Name), // todo
+        //         ValueType = ValueType.Single,
+        //     },
+        //     new()
+        //     {
+        //         Name = "Awards",
+        //         SourceName = "Awards",
+        //         SourceType = SourceType.Database,
+        //         FieldName = nameof(Award.Name),
+        //         ValueType = ValueType.Multiple,
+        //     },
+        //     new()
+        //     {
+        //         Name = "Country",
+        //         SourceName = "Countries",
+        //         SourceType = SourceType.Database,
+        //         FieldName = nameof(Country.Name),
+        //         ValueType = ValueType.Single,
+        //     },
+        // };
+        // foreach (var tag in tags)
+        // {
+        //     context.Tags.Add(tag);
+        // }
+        //
+        // await context.SaveChangesAsync();
     }
 }

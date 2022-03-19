@@ -33,7 +33,7 @@ public class MoviesService : IMoviesService
             .Include(nameof(Movie.Country))
             .Include(nameof(Movie.Directors))
             .Include(nameof(Movie.Genres))
-            .FirstOrDefault();
+            .FirstOrDefault(m => m.ID == id);
 
         return movie == null ? null : ConvertMovie(movie);
     }
