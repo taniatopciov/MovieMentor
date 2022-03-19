@@ -12,7 +12,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.3" />
         <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="6.0.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.3" />
+        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.1" />
     </ItemGroup>
 
     <ItemGroup>
@@ -25,6 +28,10 @@
     <ItemGroup>
       <Folder Include="ClientApp\src\app\services\theme-service" />
       <Folder Include="ClientApp\src\app\shared" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\MovieMentorCore\MovieMentorCore.csproj" />
     </ItemGroup>
 
     <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
