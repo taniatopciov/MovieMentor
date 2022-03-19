@@ -1,28 +1,40 @@
-﻿using MovieMentor.DTO;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MovieMentor.DAL;
+using MovieMentor.Data;
+using MovieMentor.DTO;
 
 namespace MovieMentor.Controllers;
 
 public static class MoviesController
 {
-    private static List<MovieDto> movieDtos = new()
+    public static IEnumerable<MovieDto> GetMovies([FromServices] MovieContext movieContext)
     {
-        new MovieDto(1, "Batman Begins"),
-        new MovieDto(2, "Encanto"),
-    };
-
-    public static IEnumerable<MovieDto> GetMovies()
-    {
-        return movieDtos;
+        return movieContext.Movies
+            .Include(movie => movie.Actors).ThenInclude(a => a.Country)
+            .Include(nameof(Movie.Awards))
+            .Include(nameof(Movie.Country))
+            .Include(nameof(Movie.Directors))
+            .Include(nameof(Movie.Genres))
+            .Select(m => Convert(m)).ToList();
     }
 
-    public static MovieDto? GetMovie(int id)
+    public static MovieDto? GetMovie(int id, [FromServices] MovieContext movieContext)
     {
-        return movieDtos.FirstOrDefault(m => m.Id == id);
+        var movie = movieContext.Movies
+            .Include(movie => movie.Actors).ThenInclude(a => a.Country)
+            .Include(nameof(Movie.Awards))
+            .Include(nameof(Movie.Country))
+            .Include(nameof(Movie.Directors))
+            .Include(nameof(Movie.Genres))
+            .FirstOrDefault();
+
+        return movie == null ? null : Convert(movie);
     }
 
-    public static IEnumerable<Tag> GetTags()
+    public static IEnumerable<TagDto> GetTags()
     {
-        return new List<Tag>
+        return new List<TagDto>
         {
             new("Multiple", "Genre", new List<string> { "Action", "Drama", "Comedy", "Thriller", "Horror" }),
             new("Single", "Director", new List<string> { "Christopher Nolan", "Steven Spielberg" }),
@@ -35,5 +47,13 @@ public static class MoviesController
                 new List<string> { "Best Picture", "Best Director", "Best Actor", "Best Screenplay" }),
             new("Single", "Country", new List<string> { "USA", "Romania", "Germany", "France", "Spain" }),
         };
+    }
+
+    private static MovieDto Convert(Movie movie)
+    {
+        return new MovieDto(movie.ID, movie.Title, movie.Genres.Select(g => g.Name).ToList(),
+            movie.Directors.Select(d => new DirectorDto(d.Name)).ToList(),
+            movie.Actors.Select(a => new ActorDto(a.Name, a.Country.Name)).ToList(), movie.Year,
+            movie.Awards.Select(a => a.Name).ToList(), movie.Duration, movie.Country.Name, movie.Rating);
     }
 }

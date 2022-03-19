@@ -1,18 +1,20 @@
+using Microsoft.EntityFrameworkCore;
 using MovieMentor.Controllers;
+using MovieMentor.DAL;
 using MovieMentor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-// builder.Services.AddDbContext<MovieContext>(options =>
-// {
-//     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-//     var serverVersion = ServerVersion.AutoDetect(connectionString);
-//
-//     options.UseMySql(connectionString, serverVersion);
-// });
-// builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+builder.Services.AddDbContext<MovieContext>(options =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    var serverVersion = ServerVersion.AutoDetect(connectionString);
+
+    options.UseMySql(connectionString, serverVersion);
+});
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<IKnowledgeBaseLoader, KnowledgeBaseLoader>();
@@ -40,18 +42,18 @@ app.MapPost("/api/inference", InferenceController.Infer);
 
 app.MapFallbackToFile("index.html");
 
-// using (var scope = app.Services.CreateScope())
-// {
-//     var services = scope.ServiceProvider;
-//     try
-//     {
-//         var context = services.GetRequiredService<MovieContext>();
-//         DbInitializer.Initialize(context);
-//     }
-//     catch (Exception e)
-//     {
-//         Console.Error.WriteLine("An error occured creating the DB. {0}", e);
-//     }
-// }
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<MovieContext>();
+        DbInitializer.Initialize(context);
+    }
+    catch (Exception e)
+    {
+        Console.Error.WriteLine("An error occured creating the DB. {0}", e);
+    }
+}
 
 app.Run();
