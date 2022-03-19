@@ -1,8 +1,18 @@
+using MovieMentor.Controllers;
 using MovieMentor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+// builder.Services.AddDbContext<MovieContext>(options =>
+// {
+//     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+//     var serverVersion = ServerVersion.AutoDetect(connectionString);
+//
+//     options.UseMySql(connectionString, serverVersion);
+// });
+// builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<IKnowledgeBaseLoader, KnowledgeBaseLoader>();
@@ -17,15 +27,31 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection(); // enable cors
 app.UseStaticFiles();
 app.UseRouting();
 
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller}/{action=Index}/{id?}");
+app.MapGet("/", () => "Movie Mentor works!");
+app.MapGet("/api/movies", MoviesController.GetMovies);
+app.MapGet("/api/movies/{id}", MoviesController.GetMovie);
+app.MapGet("/api/movies/tags", MoviesController.GetTags);
+app.MapPost("/api/inference", InferenceController.Infer);
 
 app.MapFallbackToFile("index.html");
+
+// using (var scope = app.Services.CreateScope())
+// {
+//     var services = scope.ServiceProvider;
+//     try
+//     {
+//         var context = services.GetRequiredService<MovieContext>();
+//         DbInitializer.Initialize(context);
+//     }
+//     catch (Exception e)
+//     {
+//         Console.Error.WriteLine("An error occured creating the DB. {0}", e);
+//     }
+// }
 
 app.Run();

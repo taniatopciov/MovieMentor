@@ -1,27 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MovieMentor.Models;
+using MovieMentor.DTO;
 using MovieMentor.Services;
 using MovieMentorCore.Models;
 
 namespace MovieMentor.Controllers;
 
-[ApiController]
-[Route("[controller]")]
-public class InferenceController : ControllerBase
+public static class InferenceController
 {
-    private readonly InferenceMachineService _inferenceMachineService;
-
-    public InferenceController(InferenceMachineService inferenceMachineService)
-    {
-        _inferenceMachineService = inferenceMachineService;
-    }
-
-    [HttpPost]
-    public IEnumerable<string> Infer(RuleInstanceDto ruleInstanceDto)
+    public static IEnumerable<string> Infer([FromBody] RuleInstanceDto ruleInstanceDto,
+        [FromServices] InferenceMachineService inferenceMachineService)
     {
         var ruleInstance = Convert(ruleInstanceDto);
 
-        var possibilities = _inferenceMachineService.Infer(ruleInstance);
+        var possibilities = inferenceMachineService.Infer(ruleInstance);
 
         return possibilities.Select(p => p.FirstOrDefault() ?? "");
     }

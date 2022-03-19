@@ -1,14 +1,26 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using MovieMentor.Models;
+﻿using MovieMentor.DTO;
 
 namespace MovieMentor.Controllers;
 
-[ApiController]
-[Route("[controller]")]
-public class MoviesController : ControllerBase
+public static class MoviesController
 {
-    [HttpGet("/tags")]
-    public IEnumerable<Tag> GetTags()
+    private static List<MovieDto> movieDtos = new()
+    {
+        new MovieDto(1, "Batman Begins"),
+        new MovieDto(2, "Encanto"),
+    };
+
+    public static IEnumerable<MovieDto> GetMovies()
+    {
+        return movieDtos;
+    }
+
+    public static MovieDto? GetMovie(int id)
+    {
+        return movieDtos.FirstOrDefault(m => m.Id == id);
+    }
+
+    public static IEnumerable<Tag> GetTags()
     {
         return new List<Tag>
         {
