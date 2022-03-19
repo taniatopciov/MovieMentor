@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MovieMentor.Models;
 using MovieMentor.Services;
-using MovieMentorCore.Inference;
 using MovieMentorCore.Models;
 
 namespace MovieMentor.Controllers;
@@ -10,26 +9,24 @@ namespace MovieMentor.Controllers;
 [Route("[controller]")]
 public class InferenceController : ControllerBase
 {
-    private readonly IKnowledgeBaseLoader _knowledgeBaseLoader;
+    private readonly InferenceMachineService _inferenceMachineService;
 
-    public InferenceController(IKnowledgeBaseLoader knowledgeBaseLoader)
+    public InferenceController(InferenceMachineService inferenceMachineService)
     {
-        _knowledgeBaseLoader = knowledgeBaseLoader;
+        _inferenceMachineService = inferenceMachineService;
     }
 
     [HttpPost]
     public IEnumerable<string> Infer(RuleInstanceDto ruleInstanceDto)
     {
-        var inferenceMachine = new InferenceMachine(_knowledgeBaseLoader.GetRules());
-
         var ruleInstance = Convert(ruleInstanceDto);
 
-        var possibilities = inferenceMachine.Infer(ruleInstance);
+        var possibilities = _inferenceMachineService.Infer(ruleInstance);
 
         return possibilities.Select(p => p.FirstOrDefault() ?? "");
     }
 
-    private RuleInstance Convert(RuleInstanceDto ruleInstanceDto)
+    private static RuleInstance Convert(RuleInstanceDto ruleInstanceDto)
     {
         return new RuleInstance(ruleInstanceDto.Name, new List<Parameter>());
     }
