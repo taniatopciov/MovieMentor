@@ -1,45 +1,52 @@
-import {Component} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {MoviesService} from "../services/movies-service/movies.service";
+import Tag from "../services/movies-service/tag";
+import ResponseChoices from "./responseChoices";
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
 
-  genreListOptions: string[] = ['Comedy', 'Drama', 'Action', 'Romance', 'Animation'];
-  directorListOptions: string[] = ['Christopher Nolan', 'Steven Spielberg', 'Quentin Tarantino', 'Martin Scorsese', 'David Fincher'];
-  castListOptions: string[] = ['Adam Sandler', 'Angelina Jolie', 'Alicia Vikander', 'Kit Harrington', 'Zendaya'];
-  durationListOptions: string[] = ['short (< 90 min)', 'medium (90 min - 120 min)', 'long ( > 120 min)'];
-  yearListOptions: string[] = ['2022', '2020-2021', 'Last 5 years', 'Last 10 Years', '2000s'];
-  awardsListOptions: string[] = ['Best Picture', 'Best Director', 'Best Actor', 'Best Actress', 'Best Screenplay'];
-  countryOfOriginListOptions: string[] = ['America', 'Romania', 'Germany', 'France', 'Spain'];
+  tags: Tag[] = [];
+  options = new Map<string, string[]>();
 
-  onUpdateSelectedGenres(selectedItems: string[]) {
-    console.log(selectedItems);
+  constructor(private moviesService: MoviesService, private changeDetectorRef: ChangeDetectorRef) {
   }
 
-  onUpdateSelectedDirectors(selectedItems: string[]) {
-    console.log(selectedItems);
+  ngOnInit() {
+    this.moviesService.getTags().subscribe(data => {
+      this.tags = data;
+      this.changeDetectorRef.detectChanges();
+    });
   }
 
-  onUpdateSelectedCast(selectedItems: string[]) {
-    console.log(selectedItems);
+  onUpdateSelectedMultipleItems(tagName: string, selectedItems: string[]) {
+    this.options.set(tagName, selectedItems);
   }
 
-  onUpdateSelectedDuration(selectedItem: string) {
-    console.log(selectedItem);
+  onUpdateSelectedSingleItem(tagName: string, selectedItem: string) {
+    this.options.set(tagName, [selectedItem]);
   }
 
-  onUpdateSelectedYear(selectedItem: string) {
-    console.log(selectedItem);
+  createOptionsObject() {
+    const selectedOptions: ResponseChoices[] = [];
+
+    this.options.forEach((values, key) => {
+      selectedOptions.push({
+        key, values
+      });
+    });
+
+    return selectedOptions;
   }
 
-  onUpdateSelectedAwards(selectedItems: string[]) {
-    console.log(selectedItems);
-  }
+  onGetRecommendationButtonClick() {
+    this.moviesService.getRecommendation(this.createOptionsObject()).subscribe(data => {
 
-  onUpdateSelectedCountries(selectedItems: string[]) {
-    console.log(selectedItems);
+    });
+    console.log(this.createOptionsObject());
   }
 }

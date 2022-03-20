@@ -1,8 +1,10 @@
-<mat-radio-group
-  aria-labelledby="example-radio-group-label"
-  class="example-radio-group"
-  [(ngModel)]="selectedItem">
-  <mat-radio-button class="example-radio-button" *ngFor="let option of listData" [value]="option" (click)="selectItem(option)">
-    {{option}}
-  </mat-radio-button>
-</mat-radio-group>
+<div class="sel-list">
+  <mat-radio-group
+    aria-labelledby="example-radio-group-label"
+    class="example-radio-group"
+    [(ngModel)]="selectedItem">
+    <mat-radio-button class="example-radio-button" *ngFor="let option of listData" [value]="option" (click)="selectItem(option)">
+      {{option}}
+    </mat-radio-button>
+  </mat-radio-group>
+</div>
