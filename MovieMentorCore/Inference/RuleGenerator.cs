@@ -7,10 +7,12 @@ public class RuleGenerator
     private readonly IDictionary<string, IList<RuleDefinition>> _allDefinitions;
     private readonly RuleValidator _ruleValidator;
 
-    private readonly List<string[]> _possibilities = new();
-    private string?[] _current = Array.Empty<string>();
+    private readonly List<ParameterList> _possibilities = new();
+    private ParameterList _current = ParameterList.Empty();
     private IList<RuleDefinition> _currentDefinitions = new List<RuleDefinition>();
-    private RuleInstance _targetRuleInstance = new("", new List<Parameter>());
+    private RuleDefinition.Instance _targetRuleInstance = new("", ParameterList.Empty());
+    private IList<string> _targetParameterNames = Array.Empty<string>();
+    private IList<IList<Parameter>> _stepPossibilities = new List<IList<Parameter>>();
 
     public RuleGenerator(IDictionary<string, IList<RuleDefinition>> allDefinitions, RuleValidator ruleValidator)
     {
@@ -18,24 +20,30 @@ public class RuleGenerator
         _ruleValidator = ruleValidator;
     }
 
-    public IList<string[]> Generate(RuleInstance ruleInstance)
+    public IList<ParameterList> Generate(RuleDefinition.Instance ruleInstance)
     {
         _targetRuleInstance = ruleInstance;
         var (name, parameters) = ruleInstance;
         if (!_allDefinitions.TryGetValue(name, out var definitions))
         {
-            return new List<string[]>();
+            return new List<ParameterList>();
         }
 
         // later rules overloading
         // definitions = definitions.Where(r => r.ParameterCount == parameters.Count).ToList();
-        if (definitions.Count == 0)
+        if (definitions.Count == 0 || parameters.Count == 0)
         {
-            return new List<string[]>();
+            return new List<ParameterList>();
         }
 
         _currentDefinitions = definitions;
-        _current = new string[parameters.Count];
+        _current = parameters;
+        _targetParameterNames = parameters.Parameters.Keys.ToList();
+
+        for (var i = 0; i < parameters.Count; i++)
+        {
+            _stepPossibilities.Add(GetPossibilities(i));
+        }
 
         Back(0);
 
@@ -44,16 +52,16 @@ public class RuleGenerator
 
     private void Back(int step)
     {
-        if (step >= _current.Length)
+        if (step >= _current.Count)
         {
             return;
         }
 
-        var possibilities = GetPossibilities(step);
+        var possibilities = _stepPossibilities[step];
 
         foreach (var possibility in possibilities)
         {
-            _current[step] = possibility;
+            _current[_targetParameterNames[step]] = possibility;
             if (!Valid(step))
             {
                 continue;
@@ -61,10 +69,7 @@ public class RuleGenerator
 
             if (Solution(step))
             {
-                var copy = new string[_current.Length];
-                Array.Copy(_current, copy, _current.Length);
-
-                _possibilities.Add(copy);
+                _possibilities.Add(_current.Copy());
             }
             else
             {
@@ -73,55 +78,133 @@ public class RuleGenerator
         }
     }
 
-    private List<string> GetPossibilities(int step)
+    private List<Parameter> GetPossibilities(int step)
     {
-        if (_targetRuleInstance.Parameters[step] is Parameter.Concrete(var targetConcreteValue))
+        var stepParameterName = _targetParameterNames[step];
+        var stepParameter = _targetRuleInstance.ParametersList[stepParameterName];
+        if (stepParameter is Parameter.SingleValue or Parameter.MultipleValues)
         {
-            return new List<string> { targetConcreteValue };
+            return new List<Parameter>
+            {
+                stepParameter
+            };
         }
 
-        var possibilities = new List<string>();
+        var possibilities = new List<Parameter>();
         foreach (var currentDefinition in _currentDefinitions)
         {
             switch (currentDefinition)
             {
-                case RuleDefinition.Concrete(_, var parameters):
-                    possibilities.Add(parameters[step].Value);
+                case RuleDefinition.Instance(_, var parameters):
+
+                    var currentParameter = parameters[stepParameterName];
+                    if (currentParameter == null)
+                    {
+                        continue;
+                    }
+
+                    if (currentParameter is Parameter.SingleValue or Parameter.MultipleValues)
+                    {
+                        possibilities.Add(currentParameter);
+                    }
+
                     break;
 
                 case RuleDefinition.Composite(_, var definitionParameters, var ruleInstances):
-                    switch (definitionParameters[step])
+                    var definitionParameter = definitionParameters[stepParameterName];
+
+                    switch (definitionParameter)
                     {
-                        case Parameter.Concrete(var value):
-                            possibilities.Add(value);
+                        case Parameter.SingleValue:
+                        case Parameter.MultipleValues:
+                            possibilities.Add(definitionParameter);
                             break;
+
                         case Parameter.Reference(var index):
                         {
-                            var ruleGenerator = new RuleGenerator(_allDefinitions, _ruleValidator);
-                            var possibilitiesSet = new HashSet<string>();
+                            var possibilitiesSetList = new List<HashSet<Parameter>>();
 
-                            foreach (var ruleInstance in ruleInstances)
+                            foreach (var (name, parametersList) in ruleInstances)
                             {
-                                if (!ruleInstance.Parameters.Any(parameter =>
-                                        parameter is Parameter.Reference(var refIndex) && refIndex == index))
+                                if (!_allDefinitions.TryGetValue(name, out var ruleInstanceDefinitions))
                                 {
                                     continue;
                                 }
 
-                                foreach (var concreteParameters in ruleGenerator.Generate(ruleInstance))
+                                var desiredParameterNames = parametersList.Parameters
+                                    .Where(pair => pair.Value is Parameter.Reference(var refIndex) && refIndex == index)
+                                    .Select(pair => pair.Key)
+                                    .ToList();
+
+                                foreach (var parameterName in desiredParameterNames)
                                 {
-                                    for (var i = 0; i < ruleInstance.Parameters.Count; i++)
+                                    var possibilitiesSet = new HashSet<Parameter>();
+                                    foreach (var ruleDefinition in ruleInstanceDefinitions)
                                     {
-                                        var param = ruleInstance.Parameters[i];
-                                        if (param is Parameter.Reference(var refIndex) && refIndex == index)
+                                        var parameter = ruleDefinition.ParametersList[parameterName];
+                                        if (parameter is Parameter.SingleValue or Parameter.MultipleValues)
                                         {
-                                            possibilitiesSet.Add(concreteParameters[i]);
+                                            possibilitiesSet.Add(parameter);
                                         }
                                     }
+
+                                    possibilitiesSetList.Add(possibilitiesSet);
                                 }
                             }
 
-                            possibilities.AddRange(possibilitiesSet);
+                            // foreach (var ruleInstance in ruleInstances)
+                            // {
+                            //     if (!_allDefinitions.TryGetValue(ruleInstance.Name, out var ruleInstanceDefinitions))
+                            //     {
+                            //         continue;
+                            //     }
+                            //
+                            //
+                            //     if (!ruleInstance.ParametersList.Parameters.Any(pair =>
+                            //             pair.Value is Parameter.Reference(var refIndex) && refIndex == index))
+                            //     {
+                            //         continue;
+                            //     }
+                            //
+                            //     var index1 = index;
+                            //     var desiredParameterNames = ruleInstance.ParametersList.Parameters
+                            //         .Where(pair =>
+                            //             pair.Value is Parameter.Reference(var refIndex) && refIndex == index1)
+                            //         .Select(pair => pair.Key)
+                            //         .ToList();
+                            //
+                            //     var ruleGenerator = new RuleGenerator(_allDefinitions, _ruleValidator);
+                            //     var concreteParametersPossibilities = ruleGenerator.Generate(ruleInstance);
+                            //
+                            //     var possibilitiesSet = new HashSet<Parameter>();
+                            //
+                            //     foreach (var concreteParameters in concreteParametersPossibilities)
+                            //     {
+                            //         foreach (var desiredParameterName in desiredParameterNames)
+                            //         {
+                            //             var concreteParameter = concreteParameters[desiredParameterName];
+                            //             if (concreteParameter != null)
+                            //             {
+                            //                 possibilitiesSet.Add(concreteParameter);
+                            //             }
+                            //         }
+                            //     }
+                            //
+                            //     possibilitiesSetList.Add(possibilitiesSet);
+                            // }
+
+                            if (possibilitiesSetList.Count > 0)
+                            {
+                                var intersectedPossibilitiesSet = possibilitiesSetList
+                                    .Skip(1)
+                                    .Aggregate(new HashSet<Parameter>(possibilitiesSetList.First()),
+                                        (h, e) =>
+                                        {
+                                            h.IntersectWith(e);
+                                            return h;
+                                        });
+                                possibilities.AddRange(intersectedPossibilitiesSet);
+                            }
 
                             break;
                         }
@@ -136,17 +219,16 @@ public class RuleGenerator
 
     private bool Valid(int step)
     {
-        return step < _current.Length && _current[step] != null;
+        return step < _current.Count; // && _current[step] != null;
     }
 
     private bool Solution(int step)
     {
-        if (step != _current.Length - 1)
+        if (step != _current.Count - 1)
         {
             return false;
         }
 
-        var parameters = _current.Select(value => new Parameter.Concrete(value ?? "")).Cast<Parameter>().ToList();
-        return _ruleValidator.Validate(new RuleInstance(_targetRuleInstance.Name, parameters));
+        return _ruleValidator.Validate(new RuleDefinition.Instance(_targetRuleInstance.Name, _current));
     }
 }

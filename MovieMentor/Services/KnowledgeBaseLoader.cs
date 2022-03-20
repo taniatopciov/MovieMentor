@@ -3,9 +3,8 @@ using MovieMentor.DAL;
 using MovieMentor.Data;
 using MovieMentor.DTO;
 using MovieMentorCore.Models;
-using Parameter = MovieMentorCore.Models.Parameter;
+using static MovieMentor.Rules.Rules;
 using Range = MovieMentorCore.Utils.Range;
-using RuleInstance = MovieMentorCore.Models.RuleInstance;
 using ValueType = MovieMentor.Data.ValueType;
 
 namespace MovieMentor.Services;
@@ -44,26 +43,13 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
         // var durationRange = new List<RuleDefinition>();
 
 
-        var durationRange = new Range(90).Select(value => new RuleDefinition.Concrete("DurationRange",
-                new List<Parameter.Concrete>
-                {
-                    new(_durations[0]),
-                    new(value.ToString())
-                }))
-            .Concat(
-                new Range(90, 120).Select(value => new RuleDefinition.Concrete("DurationRange",
-                    new List<Parameter.Concrete>
-                    {
-                        new(_durations[1]),
-                        new(value.ToString())
-                    })))
-            .Concat(
-                new Range(120, 300).Select(value => new RuleDefinition.Concrete("DurationRange",
-                    new List<Parameter.Concrete>
-                    {
-                        new(_durations[2]),
-                        new(value.ToString())
-                    })))
+        // todo combine with movie year
+        var durationRange = new Range(90)
+            .Select(value => DurationRangeDefinition(_durations[0], value.ToString()))
+            .Concat(new Range(90, 120).Select(value =>
+                DurationRangeDefinition(_durations[1], value.ToString())))
+            .Concat(new Range(120, 300).Select(value =>
+                DurationRangeDefinition(_durations[2], value.ToString())))
             .Cast<RuleDefinition>()
             .ToList();
 
@@ -73,14 +59,8 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
             .Include(nameof(Movie.Country))
             .Include(nameof(Movie.Directors))
             .Include(nameof(Movie.Genres))
-            .Select(m => new RuleDefinition.Concrete("Movie", new List<Parameter.Concrete>
-            {
-                new(m.ID.ToString()),
-                new(m.Title),
-                new(m.Year.ToString()),
-                new(m.Rating),
-                new(m.Duration.ToString()),
-            }))
+            .Select(m => MovieDefinition(m.ID.ToString(), m.Title,
+                m.Year.ToString(), m.Rating, m.Duration.ToString()))
             .Cast<RuleDefinition>()
             .ToList();
 
@@ -110,18 +90,14 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
         //     .ToList();
 
         var genreDefinition = _movieContext.Genres
-            .Select(g => new RuleDefinition.Concrete("Genre", new List<Parameter.Concrete>
-            {
-                new(g.Name)
-            }))
-            .Cast<RuleDefinition>().ToList();
+            .Select(g => GenreDefinition(g.Name))
+            .Cast<RuleDefinition>()
+            .ToList();
 
         var countryDefinition = _movieContext.Countries
-            .Select(c => new RuleDefinition.Concrete("Country", new List<Parameter.Concrete>
-            {
-                new(c.Name)
-            }))
-            .Cast<RuleDefinition>().ToList();
+            .Select(c => CountryDefinition(c.Name))
+            .Cast<RuleDefinition>()
+            .ToList();
 
         return new Dictionary<string, IList<RuleDefinition>>
         {
@@ -140,39 +116,16 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
             {
                 "SearchMovie", new List<RuleDefinition>
                 {
-                    new RuleDefinition.Composite("SearchMovie", new List<Parameter>
-                    {
-                        new Parameter.Reference(0), // id
-                        new Parameter.Reference(1), // title
-                        new Parameter.Reference(2), // year
-                        new Parameter.Reference(3), // rating
-                        new Parameter.Reference(4), // duration
-                        new Parameter.Reference(5), // duration type (long
-                    }, new List<RuleInstance>
-                    {
-                        new("Movie", new List<Parameter>
-                        {
-                            new Parameter.Reference(0), // id
-                            new Parameter.Reference(1), // title
-                            new Parameter.Reference(2), // year
-                            new Parameter.Reference(3), // rating
-                            new Parameter.Reference(4), // duration
-                        }),
-                        new("DurationRange", new List<Parameter>
-                        {
-                            new Parameter.Reference(5),
-                            new Parameter.Reference(4),
-                        })
-                    })
+                    SearchMovieDefinition(),
                 }
             }
         };
     }
 
-    private static RuleInstance AddToList(ICollection<RuleDefinition> definitions, RuleInstance ruleInstance)
+    private static RuleDefinition.Instance AddToList(ICollection<RuleDefinition> definitions,
+        RuleDefinition.Instance ruleInstance)
     {
-        definitions.Add(new RuleDefinition.Concrete(ruleInstance.Name,
-            ruleInstance.Parameters.OfType<Parameter.Concrete>().ToList()));
+        definitions.Add(new RuleDefinition.Instance(ruleInstance.Name, ruleInstance.ParametersList));
 
         return ruleInstance;
     }

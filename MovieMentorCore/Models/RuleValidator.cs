@@ -9,22 +9,22 @@ public class RuleValidator
         _allDefinitions = allDefinitions;
     }
 
-    public bool Validate(RuleInstance ruleInstance)
+    public bool Validate(RuleDefinition.Instance ruleInstance)
     {
-        var (name, parameters) = ruleInstance;
+        var (name, parameterList) = ruleInstance;
         if (!_allDefinitions.TryGetValue(name, out var definitions))
         {
             return false;
         }
 
-        if (parameters.Any(param => param is Parameter.Reference))
+        if (parameterList.HasReferences)
         {
             return false;
         }
 
         foreach (var definition in definitions)
         {
-            if (definition.ParameterCount != parameters.Count)
+            if (definition.ParametersList.Count != parameterList.Count)
             {
                 continue;
             }
@@ -36,33 +36,53 @@ public class RuleValidator
                 {
                     var allMatch = true;
 
-                    foreach (var (instanceName, instanceParameters) in definitionInstances)
+                    // foreach definition instance
+                    // replace the reference parameters of the original rule instance
+                    // with the provided parameters
+                    foreach (var (instanceName, instanceParameterList) in definitionInstances)
                     {
-                        IList<Parameter> updatedParams = new List<Parameter>();
-                        foreach (var instanceParameter in instanceParameters)
+                        var updatedParameterListBuilder = new ParameterList.Builder();
+
+                        // replace instanceParameterList reference parameters with the provided parameters
+
+                        foreach (var (parameterName, parameter) in instanceParameterList.Parameters)
                         {
-                            if (instanceParameter is Parameter.Reference(var index))
+                            if (parameter is Parameter.Reference(var index))
                             {
-                                var indexOfConcreteParam =
-                                    definitionParameters.IndexOf(p => p is Parameter.Reference(var i) && i == index);
-                                if (indexOfConcreteParam == -1)
+                                // search in definition for reference parameter with index
+                                var definitionReferenceParameterName = definitionParameters.Parameters
+                                    .FirstOrDefault(pair =>
+                                        pair.Value is Parameter.Reference(var refIndex) && refIndex == index).Key;
+                                // search for concrete parameter in provided rule instance
+                                var concreteParameter = parameterList[definitionReferenceParameterName];
+                                if (concreteParameter == null)
                                 {
-                                    return false;
+                                    allMatch = false;
+                                    break;
                                 }
 
-                                updatedParams.Add(parameters[indexOfConcreteParam]);
+                                updatedParameterListBuilder =
+                                    updatedParameterListBuilder.AddParameter(parameterName, concreteParameter);
                             }
                             else
                             {
-                                updatedParams.Add(instanceParameter);
+                                updatedParameterListBuilder =
+                                    updatedParameterListBuilder.AddParameter(parameterName, parameter);
                             }
                         }
 
-                        var updatedDefinitionInstance = new RuleInstance(instanceName, updatedParams);
+                        if (!allMatch)
+                        {
+                            break;
+                        }
+
+                        var updatedDefinitionInstance =
+                            new RuleDefinition.Instance(instanceName, updatedParameterListBuilder.Build());
 
                         if (!Validate(updatedDefinitionInstance))
                         {
-                            return false;
+                            allMatch = false;
+                            break;
                         }
                     }
 
@@ -73,16 +93,58 @@ public class RuleValidator
                 }
 
                     break;
-                case RuleDefinition.Concrete(var definitionName, var concreteParameters) when definitionName == name:
+
+                case RuleDefinition.Instance(var definitionName, var concreteParametersList)
+                    when definitionName == name:
                 {
                     var allMatch = true;
-                    for (var i = 0; i < parameters.Count; i++)
+
+                    foreach (var (parameterName, parameter) in parameterList.Parameters)
                     {
-                        var param = parameters[i] as Parameter.Concrete;
-                        if (concreteParameters[i].Value != param?.Value)
+                        var concreteParam = concreteParametersList[parameterName];
+                        if (concreteParam == null)
                         {
                             allMatch = false;
                             break;
+                        }
+
+                        switch (parameter)
+                        {
+                            case Parameter.MultipleValues(var values):
+                                if (concreteParam is not Parameter.MultipleValues(var concreteValues))
+                                {
+                                    allMatch = false;
+                                    break;
+                                }
+
+                                if (values.Count != concreteValues.Count)
+                                {
+                                    allMatch = false;
+                                    break;
+                                }
+
+                                if (concreteValues.Any(value => !values.Contains(value)))
+                                {
+                                    allMatch = false;
+                                    // add break if conditions are added
+                                }
+
+                                break;
+
+                            case Parameter.SingleValue(var value):
+                                if (concreteParam is not Parameter.SingleValue(var concreteValue))
+                                {
+                                    allMatch = false;
+                                    break;
+                                }
+
+                                if (value != concreteValue)
+                                {
+                                    allMatch = false;
+                                    // add break if conditions are added
+                                }
+
+                                break;
                         }
                     }
 

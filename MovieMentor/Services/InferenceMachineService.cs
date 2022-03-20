@@ -12,7 +12,7 @@ public class InferenceMachineService : IInferenceMachineService
         _knowledgeBaseLoader = knowledgeBaseLoader;
     }
 
-    public IEnumerable<string[]> Infer(RuleInstance ruleInstance)
+    public IEnumerable<ParameterList> Infer(RuleDefinition.Instance ruleInstance)
     {
         var inferenceMachine = new InferenceMachine(_knowledgeBaseLoader.GetRules());
 

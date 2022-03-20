@@ -4,5 +4,5 @@ namespace MovieMentor.Services;
 
 public interface IInferenceMachineService
 {
-    IEnumerable<string[]> Infer(RuleInstance ruleInstance);
+    IEnumerable<ParameterList> Infer(RuleDefinition.Instance ruleInstance);
 }

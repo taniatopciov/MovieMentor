@@ -15,21 +15,28 @@ public static class InferenceController
         var possibilities = inferenceMachineService.Infer(ruleInstance);
 
         return possibilities
-            .Where(p => p.Length >= 1)
-            .Select(p => !int.TryParse(p[0], out var id) ? null : moviesService.GetMovie(id))
+            .Where(p => p.Count >= 1)
+            .Select(parameters =>
+            {
+                var idParameter = parameters["ID"];
+                if (idParameter is Parameter.SingleValue (var value))
+                {
+                    return !int.TryParse(value, out var id) ? null : moviesService.GetMovie(id);
+                }
+
+                return null;
+            })
             .OfType<MovieDto>();
     }
 
-    private static RuleInstance Convert(RecommendationDto recommendationDto)
+    private static RuleDefinition.Instance Convert(RecommendationDto recommendationDto)
     {
-        return new RuleInstance("SearchMovie", new List<Parameter>
-        {
-            new Parameter.Reference(0), // id
-            new Parameter.Reference(1), // title
-            new Parameter.Concrete("2021"), // year
-            new Parameter.Concrete("7.3"), // rating
-            new Parameter.Reference(2), // duration
-            new Parameter.Concrete("medium (90 min - 120 min)"), // duration type (long
-        });
+        return Rules.Rules.SearchMovieInstance(
+            new Parameter.Reference(0),
+            new Parameter.Reference(1),
+            new Parameter.SingleValue("2021"),
+            new Parameter.SingleValue("7.3"),
+            new Parameter.Reference(2),
+            new Parameter.SingleValue("medium (90 min - 120 min)"));
     }
 }
