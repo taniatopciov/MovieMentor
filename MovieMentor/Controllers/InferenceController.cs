@@ -31,10 +31,24 @@ public static class InferenceController
 
     private static RuleDefinition.Instance Convert(RecommendationDto recommendationDto)
     {
+        var year = recommendationDto.GetSingleValue(KnowledgeBaseLoader.YearChoice);
+        Parameter yearParameter = year == null ? new Parameter.DontCare() : new Parameter.SingleValue(year);
+
+        var rating = recommendationDto.GetSingleValue(KnowledgeBaseLoader.RatingChoice);
+        Parameter ratingParameter = rating == null ? new Parameter.DontCare() : new Parameter.SingleValue(rating);
+
+        var durationType = recommendationDto.GetSingleValue(KnowledgeBaseLoader.DurationChoice);
+        Parameter durationTypeParameter =
+            durationType == null ? new Parameter.DontCare() : new Parameter.SingleValue(durationType);
+
+        var country = recommendationDto.GetSingleValue(KnowledgeBaseLoader.CountryChoice);
+        Parameter countryParameter = country == null ? new Parameter.DontCare() : new Parameter.SingleValue(country);
+
         return Rules.Rules.SearchMovieInstance(
             new Parameter.Reference(0),
-            new Parameter.SingleValue("2021"),
-            new Parameter.SingleValue("7.3"),
-            new Parameter.SingleValue("medium (90 min - 120 min)"));
+            yearParameter,
+            ratingParameter,
+            durationTypeParameter,
+            countryParameter);
     }
 }

@@ -11,6 +11,15 @@ namespace MovieMentor.Services;
 
 public class KnowledgeBaseLoader : IKnowledgeBaseLoader
 {
+    public const string GenreChoice = "Genre";
+    public const string DirectorChoice = "Director";
+    public const string ActorsChoice = "Actors";
+    public const string DurationChoice = "Duration";
+    public const string YearChoice = "Year";
+    public const string RatingChoice = "Rating";
+    public const string AwardsChoice = "Awards";
+    public const string CountryChoice = "Country";
+
     private static readonly PredicateRule DurationPredicateRule =
         new PredicateRule.Builder("DurationType", "long (> 120 min)")
             .AddChoice("short (< 90 min)", v => v < 90)
@@ -28,14 +37,14 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
     {
         return new List<ChoiceDto>
         {
-            new(nameof(ValueType.Multiple), "Genre", _movieContext.Genres.Select(g => g.Name).ToList()),
-            new(nameof(ValueType.Multiple), "Director", _movieContext.Directors.Select(d => d.Name).ToList()),
-            new(nameof(ValueType.Multiple), "Actors", _movieContext.Actors.Select(a => a.Name).ToList()),
-            new(nameof(ValueType.Single), "Duration", DurationPredicateRule.GetLabels()),
-            new(nameof(ValueType.Single), "Year", new List<string> { "'80s", "'90s", "2000s", "2010s", "2020s" }),
-            new(nameof(ValueType.Single), "Rating", new List<string> { "> 9", "8-9", "7-8", "6-7", "< 6" }),
-            new(nameof(ValueType.Multiple), "Awards", _movieContext.Awards.Select(a => a.Name).ToList()),
-            new(nameof(ValueType.Single), "Country", _movieContext.Countries.Select(c => c.Name).ToList()),
+            // new(nameof(ValueType.Multiple), GenreChoice, _movieContext.Genres.Select(g => g.Name).ToList()),
+            // new(nameof(ValueType.Multiple), DirectorChoice, _movieContext.Directors.Select(d => d.Name).ToList()),
+            // new(nameof(ValueType.Multiple), ActorsChoice, _movieContext.Actors.Select(a => a.Name).ToList()),
+            new(nameof(ValueType.Single), DurationChoice, DurationPredicateRule.GetLabels()),
+            new(nameof(ValueType.Single), YearChoice, new List<string> { "'80s", "'90s", "2000s", "2010s", "2020s" }),
+            new(nameof(ValueType.Single), RatingChoice, new List<string> { "> 9", "8-9", "7-8", "6-7", "< 6" }),
+            // new(nameof(ValueType.Multiple), AwardsChoice, _movieContext.Awards.Select(a => a.Name).ToList()),
+            new(nameof(ValueType.Single), CountryChoice, _movieContext.Countries.Select(c => c.Name).ToList()),
         };
     }
 
@@ -50,7 +59,8 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
             .Include(nameof(Movie.Directors))
             .Include(nameof(Movie.Genres))
             .Select(m => MovieDefinition(m.ID.ToString(), m.Title,
-                m.Year.ToString(), m.Rating, AddDurationRange(durationRange, m.Duration).ToString()))
+                m.Year.ToString(), m.Rating,
+                AddDurationRange(durationRange, m.Duration).ToString(), m.Country.Name))
             .Cast<RuleDefinition>()
             .ToList();
 

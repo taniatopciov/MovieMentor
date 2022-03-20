@@ -130,6 +130,7 @@ public class RuleGenerator
                                     continue;
                                 }
 
+                                // todo check if missing nested reference values
                                 var desiredParameterNames = parametersList.Parameters
                                     .Where(pair => pair.Value is Parameter.Reference(var refIndex) && refIndex == index)
                                     .Select(pair => pair.Key)
