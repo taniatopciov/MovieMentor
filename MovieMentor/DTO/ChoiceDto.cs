@@ -1,3 +1,3 @@
 ﻿namespace MovieMentor.DTO;
 
-public record ChoiceDto(string Name, string Type, List<string> Values);
+public record ChoiceDto(string Type, string Name, List<string> Values);
