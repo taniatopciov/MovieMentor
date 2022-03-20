@@ -8,11 +8,12 @@ public class RuleGenerator
     private readonly RuleValidator _ruleValidator;
 
     private readonly List<ParameterList> _possibilities = new();
+    private readonly IList<IList<Parameter>> _parameterPossibilities = new List<IList<Parameter>>();
+
     private ParameterList _current = ParameterList.Empty();
     private IList<RuleDefinition> _currentDefinitions = new List<RuleDefinition>();
     private RuleDefinition.Instance _targetRuleInstance = new("", ParameterList.Empty());
     private IList<string> _targetParameterNames = Array.Empty<string>();
-    private IList<IList<Parameter>> _stepPossibilities = new List<IList<Parameter>>();
 
     public RuleGenerator(IDictionary<string, IList<RuleDefinition>> allDefinitions, RuleValidator ruleValidator)
     {
@@ -42,7 +43,7 @@ public class RuleGenerator
 
         for (var i = 0; i < parameters.Count; i++)
         {
-            _stepPossibilities.Add(GetPossibilities(i));
+            _parameterPossibilities.Add(GetPossibilities(i));
         }
 
         Back(0);
@@ -57,9 +58,7 @@ public class RuleGenerator
             return;
         }
 
-        var possibilities = _stepPossibilities[step];
-
-        foreach (var possibility in possibilities)
+        foreach (var possibility in _parameterPossibilities[step])
         {
             _current[_targetParameterNames[step]] = possibility;
             if (!Valid(step))
@@ -152,47 +151,6 @@ public class RuleGenerator
                                 }
                             }
 
-                            // foreach (var ruleInstance in ruleInstances)
-                            // {
-                            //     if (!_allDefinitions.TryGetValue(ruleInstance.Name, out var ruleInstanceDefinitions))
-                            //     {
-                            //         continue;
-                            //     }
-                            //
-                            //
-                            //     if (!ruleInstance.ParametersList.Parameters.Any(pair =>
-                            //             pair.Value is Parameter.Reference(var refIndex) && refIndex == index))
-                            //     {
-                            //         continue;
-                            //     }
-                            //
-                            //     var index1 = index;
-                            //     var desiredParameterNames = ruleInstance.ParametersList.Parameters
-                            //         .Where(pair =>
-                            //             pair.Value is Parameter.Reference(var refIndex) && refIndex == index1)
-                            //         .Select(pair => pair.Key)
-                            //         .ToList();
-                            //
-                            //     var ruleGenerator = new RuleGenerator(_allDefinitions, _ruleValidator);
-                            //     var concreteParametersPossibilities = ruleGenerator.Generate(ruleInstance);
-                            //
-                            //     var possibilitiesSet = new HashSet<Parameter>();
-                            //
-                            //     foreach (var concreteParameters in concreteParametersPossibilities)
-                            //     {
-                            //         foreach (var desiredParameterName in desiredParameterNames)
-                            //         {
-                            //             var concreteParameter = concreteParameters[desiredParameterName];
-                            //             if (concreteParameter != null)
-                            //             {
-                            //                 possibilitiesSet.Add(concreteParameter);
-                            //             }
-                            //         }
-                            //     }
-                            //
-                            //     possibilitiesSetList.Add(possibilitiesSet);
-                            // }
-
                             if (possibilitiesSetList.Count > 0)
                             {
                                 var intersectedPossibilitiesSet = possibilitiesSetList
@@ -219,7 +177,7 @@ public class RuleGenerator
 
     private bool Valid(int step)
     {
-        return step < _current.Count; // && _current[step] != null;
+        return step < _current.Count;
     }
 
     private bool Solution(int step)

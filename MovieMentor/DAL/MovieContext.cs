@@ -17,8 +17,6 @@ public class MovieContext : DbContext
 
     public DbSet<Genre> Genres { get; set; }
 
-    // public DbSet<Rule> Rules { get; set; }
-
     public MovieContext(DbContextOptions<MovieContext> options) : base(options)
     {
     }
