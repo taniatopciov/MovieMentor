@@ -33,10 +33,8 @@ public static class InferenceController
     {
         return Rules.Rules.SearchMovieInstance(
             new Parameter.Reference(0),
-            new Parameter.Reference(1),
             new Parameter.SingleValue("2021"),
             new Parameter.SingleValue("7.3"),
-            new Parameter.Reference(2),
             new Parameter.SingleValue("medium (90 min - 120 min)"));
     }
 }

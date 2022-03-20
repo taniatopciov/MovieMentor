@@ -4,36 +4,41 @@ namespace MovieMentor.Rules;
 
 public static partial class Rules
 {
-    public static RuleDefinition.Composite SearchMovieDefinition() => new("SearchMovie",
-        new ParameterList.Builder()
-            .AddParameter("ID", new Parameter.Reference(0))
-            .AddParameter("Title", new Parameter.Reference(1))
-            .AddParameter("Year", new Parameter.Reference(2))
-            .AddParameter("Rating", new Parameter.Reference(3))
-            .AddParameter("Duration", new Parameter.Reference(4))
-            .AddParameter("DurationType", new Parameter.Reference(5))
-            .Build()
-        , new List<RuleDefinition.Instance>
-        {
-            MovieRuleInstance(
-                new Parameter.Reference(0),
-                new Parameter.Reference(1),
-                new Parameter.Reference(2),
-                new Parameter.Reference(3),
-                new Parameter.Reference(4)),
-            DurationRangeInstance(
-                new Parameter.Reference(5),
-                new Parameter.Reference(4)),
-        });
+    public static RuleDefinition.Composite SearchMovieDefinition()
+    {
+        const int idIndex = 0;
+        const int yearIndex = 1;
+        const int ratingIndex = 2;
+        const int durationTypeIndex = 3;
+        const int durationIndex = 4;
+        
+        return new RuleDefinition.Composite("SearchMovie",
+            new ParameterList.Builder()
+                .AddParameter("ID", new Parameter.Reference(idIndex))
+                .AddParameter("Year", new Parameter.Reference(yearIndex))
+                .AddParameter("Rating", new Parameter.Reference(ratingIndex))
+                .AddParameter("DurationType", new Parameter.Reference(durationTypeIndex))
+                .Build()
+            , new List<RuleDefinition.Instance>
+            {
+                MovieRuleInstance(
+                    new Parameter.Reference(idIndex),
+                    new Parameter.DontCare(),
+                    new Parameter.Reference(yearIndex),
+                    new Parameter.Reference(ratingIndex),
+                    new Parameter.Reference(durationIndex)),
+                DurationRangeInstance(
+                    new Parameter.Reference(durationTypeIndex),
+                    new Parameter.Reference(durationIndex)),
+            });
+    }
 
-    public static RuleDefinition.Instance SearchMovieInstance(Parameter id, Parameter title, Parameter year,
-        Parameter rating, Parameter duration, Parameter durationType) => new("SearchMovie",
+    public static RuleDefinition.Instance SearchMovieInstance(Parameter id, Parameter year,
+        Parameter rating, Parameter durationType) => new("SearchMovie",
         new ParameterList.Builder()
             .AddParameter("ID", id)
-            .AddParameter("Title", title)
             .AddParameter("Year", year)
             .AddParameter("Rating", rating)
-            .AddParameter("Duration", duration)
             .AddParameter("DurationType", durationType)
             .Build());
 }

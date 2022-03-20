@@ -53,12 +53,24 @@ public class RuleValidator
                                 var definitionReferenceParameterName = definitionParameters.Parameters
                                     .FirstOrDefault(pair =>
                                         pair.Value is Parameter.Reference(var refIndex) && refIndex == index).Key;
+                                if (definitionReferenceParameterName == default) // it can be null
+                                {
+                                    updatedParameterListBuilder =
+                                        updatedParameterListBuilder.AddParameter(parameterName,
+                                            new Parameter.DontCare());
+                                    continue;
+                                }
+
                                 // search for concrete parameter in provided rule instance
                                 var concreteParameter = parameterList[definitionReferenceParameterName];
                                 if (concreteParameter == null)
                                 {
-                                    allMatch = false;
-                                    break;
+                                    // allMatch = false;
+                                    // break;
+                                    updatedParameterListBuilder =
+                                        updatedParameterListBuilder.AddParameter(parameterName,
+                                            new Parameter.DontCare());
+                                    continue;
                                 }
 
                                 updatedParameterListBuilder =
@@ -110,6 +122,8 @@ public class RuleValidator
 
                         switch (parameter)
                         {
+                            case Parameter.DontCare:
+                                break;
                             case Parameter.MultipleValues(var values):
                                 if (concreteParam is not Parameter.MultipleValues(var concreteValues))
                                 {
