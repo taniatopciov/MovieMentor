@@ -1,6 +1,7 @@
-﻿using MovieMentor.Data;
+﻿using MovieMentorCore.Data;
+using MovieMentorDatabase.DAL;
 
-namespace MovieMentor.DAL;
+namespace MovieMentorDatabase;
 
 public static class DbInitializer
 {

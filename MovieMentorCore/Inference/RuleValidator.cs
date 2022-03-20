@@ -1,4 +1,6 @@
-﻿namespace MovieMentorCore.Models;
+﻿using MovieMentorCore.Models;
+
+namespace MovieMentorCore.Inference;
 
 public class RuleValidator
 {

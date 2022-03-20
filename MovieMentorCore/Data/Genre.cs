@@ -1,6 +1,6 @@
-﻿namespace MovieMentor.Data;
+﻿namespace MovieMentorCore.Data;
 
-public class Director
+public class Genre
 {
     public int ID { get; set; }
     

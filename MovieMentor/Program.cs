@@ -43,18 +43,5 @@ app.MapPost("/api/inference", InferenceController.Infer);
 
 app.MapFallbackToFile("index.html");
 
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    try
-    {
-        var context = services.GetRequiredService<MovieContext>();
-        await DbInitializer.Initialize(context);
-    }
-    catch (Exception e)
-    {
-        Console.Error.WriteLine("An error occured creating the DB. {0}", e);
-    }
-}
 
 app.Run();

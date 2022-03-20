@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieMentorCore", "MovieMen
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieMentorTests", "MovieMentorTests\MovieMentorTests.csproj", "{F9A07D75-AB13-462E-A8DE-759750F6CD96}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieMentorDatabase", "MovieMentorDatabase\MovieMentorDatabase.csproj", "{76D326E2-A2AF-4183-9A6C-E2A950392BDF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{F9A07D75-AB13-462E-A8DE-759750F6CD96}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9A07D75-AB13-462E-A8DE-759750F6CD96}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9A07D75-AB13-462E-A8DE-759750F6CD96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76D326E2-A2AF-4183-9A6C-E2A950392BDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76D326E2-A2AF-4183-9A6C-E2A950392BDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76D326E2-A2AF-4183-9A6C-E2A950392BDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76D326E2-A2AF-4183-9A6C-E2A950392BDF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MovieMentor.DAL;
-using MovieMentor.Data;
 using MovieMentor.DTO;
+using MovieMentorCore.Data;
 
 namespace MovieMentor.Services;
 

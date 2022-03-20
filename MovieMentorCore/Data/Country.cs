@@ -1,6 +1,6 @@
-﻿namespace MovieMentor.Data;
+﻿namespace MovieMentorCore.Data;
 
-public class Award
+public class Country
 {
     public int ID { get; set; }
 

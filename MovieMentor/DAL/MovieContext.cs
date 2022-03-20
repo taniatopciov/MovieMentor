@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MovieMentor.Data;
+using MovieMentorCore.Data;
 
 namespace MovieMentor.DAL;
 

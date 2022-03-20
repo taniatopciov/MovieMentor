@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MovieMentor.DAL;
-using MovieMentor.Data;
 using MovieMentor.DTO;
 using MovieMentor.Rules;
+using MovieMentorCore.Data;
 using MovieMentorCore.Models;
 using static MovieMentor.Rules.Rules;
-using ValueType = MovieMentor.Data.ValueType;
+using ValueType = MovieMentorCore.Data.ValueType;
 
 namespace MovieMentor.Services;
 
@@ -21,7 +21,7 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
     public const string CountryChoice = "Country";
 
     private static readonly PredicateRule DurationPredicateRule =
-        new PredicateRule.Builder("DurationType", "long (> 120 min)")
+        new PredicateRule.Builder("DurationRange", "long (> 120 min)")
             .AddChoice("short (< 90 min)", v => v < 90)
             .AddChoice("medium (90 min - 120 min)", v => v is >= 90 and < 120)
             .Build();
@@ -101,7 +101,7 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
     private static int AddDurationRange(ICollection<RuleDefinition> definitions, int value)
     {
         var label = DurationPredicateRule.Evaluate(value);
-        definitions.Add(DurationRangeDefinition(label, value.ToString()));
+        definitions.Add(DurationRangeDefinition(label, value.ToString())); // todo do not add if exists
 
         return value;
     }
