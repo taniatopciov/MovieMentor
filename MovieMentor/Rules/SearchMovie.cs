@@ -8,15 +8,16 @@ public static partial class Rules
     {
         const int idIndex = 0;
         const int yearIndex = 1;
-        const int ratingIndex = 2;
-        const int durationTypeIndex = 3;
-        const int durationIndex = 4;
-        const int countryIndex = 5;
+        const int yearRangeIndex = 2;
+        const int ratingIndex = 3;
+        const int durationTypeIndex = 4;
+        const int durationIndex = 5;
+        const int countryIndex = 6;
 
         return new RuleDefinition.Composite("SearchMovie",
             new ParameterList.Builder()
                 .AddParameter("ID", new Parameter.Reference(idIndex))
-                .AddParameter("Year", new Parameter.Reference(yearIndex))
+                .AddParameter("YearRange", new Parameter.Reference(yearRangeIndex))
                 .AddParameter("Rating", new Parameter.Reference(ratingIndex))
                 .AddParameter("DurationType", new Parameter.Reference(durationTypeIndex))
                 .AddParameter("Country", new Parameter.Reference(countryIndex))
@@ -33,6 +34,10 @@ public static partial class Rules
                 DurationRangeInstance(
                     new Parameter.Reference(durationTypeIndex),
                     new Parameter.Reference(durationIndex)),
+                YearRangeInstance(
+                    new Parameter.Reference(yearRangeIndex),
+                    new Parameter.Reference(yearIndex)
+                ),
                 CountryInstance(new Parameter.Reference(countryIndex))
             });
     }
@@ -41,7 +46,7 @@ public static partial class Rules
         Parameter durationType, Parameter country) => new("SearchMovie",
         new ParameterList.Builder()
             .AddParameter("ID", id)
-            .AddParameter("Year", year)
+            .AddParameter("YearRange", year)
             .AddParameter("Rating", rating)
             .AddParameter("DurationType", durationType)
             .AddParameter("Country", country)

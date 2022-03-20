@@ -15,7 +15,7 @@ public static class InferenceController
         var possibilities = inferenceMachineService.Infer(ruleInstance);
 
         return possibilities
-            .Where(p => p.Count >= 1)
+            .DistinctBy(p => p["ID"])
             .Select(parameters =>
             {
                 var idParameter = parameters["ID"];

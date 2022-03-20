@@ -26,6 +26,14 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
             .AddChoice("medium (90 min - 120 min)", v => v is >= 90 and < 120)
             .Build();
 
+    private static readonly PredicateRule YearPredicateRule = new PredicateRule.Builder("YearRange", "Other")
+        .AddChoice("'80", y => y is >= 1980 and < 1990)
+        .AddChoice("'90", y => y is >= 1990 and < 2000)
+        .AddChoice("2000s", y => y is >= 2000 and < 2010)
+        .AddChoice("2010s", y => y is >= 2010 and < 2020)
+        .AddChoice("2020s", y => y is >= 2020 and < 2030)
+        .Build();
+
     private readonly MovieContext _movieContext;
 
     public KnowledgeBaseLoader(MovieContext movieContext)
@@ -41,7 +49,7 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
             // new(nameof(ValueType.Multiple), DirectorChoice, _movieContext.Directors.Select(d => d.Name).ToList()),
             // new(nameof(ValueType.Multiple), ActorsChoice, _movieContext.Actors.Select(a => a.Name).ToList()),
             new(nameof(ValueType.Single), DurationChoice, DurationPredicateRule.GetLabels()),
-            new(nameof(ValueType.Single), YearChoice, new List<string> { "'80s", "'90s", "2000s", "2010s", "2020s" }),
+            new(nameof(ValueType.Single), YearChoice, YearPredicateRule.GetLabels()),
             new(nameof(ValueType.Single), RatingChoice, new List<string> { "> 9", "8-9", "7-8", "6-7", "< 6" }),
             // new(nameof(ValueType.Multiple), AwardsChoice, _movieContext.Awards.Select(a => a.Name).ToList()),
             new(nameof(ValueType.Single), CountryChoice, _movieContext.Countries.Select(c => c.Name).ToList()),
@@ -51,6 +59,7 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
     public IDictionary<string, IList<RuleDefinition>> GetRules()
     {
         var durationRange = new List<RuleDefinition>();
+        var yearRange = new List<RuleDefinition>();
 
         var moviesDefinitions = _movieContext.Movies
             .Include(movie => movie.Actors).ThenInclude(a => a.Country)
@@ -59,7 +68,7 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
             .Include(nameof(Movie.Directors))
             .Include(nameof(Movie.Genres))
             .Select(m => MovieDefinition(m.ID.ToString(), m.Title,
-                m.Year.ToString(), m.Rating,
+                AddYearRange(yearRange, m.Year).ToString(), m.Rating,
                 AddDurationRange(durationRange, m.Duration).ToString(), m.Country.Name))
             .Cast<RuleDefinition>()
             .ToList();
@@ -90,6 +99,9 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
                 "DurationRange", durationRange
             },
             {
+                "YearRange", yearRange
+            },
+            {
                 "SearchMovie", new List<RuleDefinition>
                 {
                     SearchMovieDefinition(),
@@ -100,8 +112,26 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
 
     private static int AddDurationRange(ICollection<RuleDefinition> definitions, int value)
     {
+        if (definitions.Any(d => d.ParametersList[value.ToString()] != null))
+        {
+            return value;
+        }
+
         var label = DurationPredicateRule.Evaluate(value);
-        definitions.Add(DurationRangeDefinition(label, value.ToString())); // todo do not add if exists
+        definitions.Add(DurationRangeDefinition(label, value.ToString()));
+
+        return value;
+    }
+
+    private static int AddYearRange(ICollection<RuleDefinition> definitions, int value)
+    {
+        if (definitions.Any(d => d.ParametersList[value.ToString()] != null))
+        {
+            return value;
+        }
+
+        var label = YearPredicateRule.Evaluate(value);
+        definitions.Add(YearRangeDefinition(label, value.ToString()));
 
         return value;
     }
