@@ -1,0 +1,11 @@
+.sel-list {
+  overflow: auto;
+  height: 230px;
+}
+
+@media (min-width: 1440px) {
+  .sel-list {
+    overflow: auto;
+    height: 515px;
+  }
+}

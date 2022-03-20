@@ -8,6 +8,7 @@ import {AppComponent} from './app.component';
 import {NavMenuComponent} from './nav-menu/nav-menu.component';
 import {HomeComponent} from './home/home.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { FlexLayoutModule } from '@angular/flex-layout';
 
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatToolbarModule} from '@angular/material/toolbar';
@@ -19,6 +20,8 @@ import {MatInputModule} from '@angular/material/input';
 import {MatCardModule} from '@angular/material/card';
 import {MatListModule} from '@angular/material/list';
 import {MatRadioModule} from '@angular/material/radio';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+
 import { MultipleSelectionListComponent } from './shared/multiple-selection-list/multiple-selection-list.component';
 import { SingleSelectionListComponent } from './shared/single-selection-list/single-selection-list.component';
 
@@ -35,6 +38,7 @@ import { SingleSelectionListComponent } from './shared/single-selection-list/sin
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
+    FlexLayoutModule,
     RouterModule.forRoot([
       {path: '', component: HomeComponent, pathMatch: 'full'}
     ]),
@@ -48,7 +52,8 @@ import { SingleSelectionListComponent } from './shared/single-selection-list/sin
     MatInputModule,
     MatCardModule,
     MatListModule,
-    MatRadioModule
+    MatRadioModule,
+    MatProgressSpinnerModule
   ],
   providers: [],
   bootstrap: [AppComponent]
