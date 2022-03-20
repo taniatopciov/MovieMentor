@@ -1,8 +1,8 @@
-﻿namespace MovieMentor.Data;
+﻿namespace MovieMentorCore.Data;
 
-public class Genre
+public class Country
 {
     public int ID { get; set; }
-    
+
     public string Name { get; set; }
 }

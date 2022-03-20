@@ -1,4 +1,4 @@
-﻿namespace MovieMentor.Data;
+﻿namespace MovieMentorCore.Data;
 
 public class Actor
 {

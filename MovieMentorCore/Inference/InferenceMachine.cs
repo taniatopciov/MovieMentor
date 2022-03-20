@@ -23,7 +23,7 @@ public class InferenceMachine
         }
     }
 
-    public IList<string[]> Infer(RuleInstance ruleInstance)
+    public IList<ParameterList> Infer(RuleDefinition.Instance ruleInstance)
     {
         var ruleGenerator = new RuleGenerator(_allDefinitions, new RuleValidator(_allDefinitions));
 
