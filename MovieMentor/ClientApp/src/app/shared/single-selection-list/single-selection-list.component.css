@@ -11,11 +11,13 @@
 .sel-list {
   overflow: auto;
   height: 230px;
+  margin-left: 10px;
 }
 
 @media (min-width: 1440px) {
   .sel-list {
     overflow: auto;
-    height: 515px;
+    height: 512px;
+    margin-left: 10px;
   }
 }

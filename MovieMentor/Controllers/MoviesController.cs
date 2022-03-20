@@ -24,11 +24,11 @@ public static class MoviesController
     {
         return new List<Tag>
         {
-            new("Multiple", "Genre", new List<string> { "Action", "Drama", "Comedy", "Thriller", "Horror" }),
+            new("Multiple", "Genre", new List<string> { "Action", "Drama", "Comedy", "Thriller", "Horror", "Ceva", "Altceva", "Miau", "Bau", "Ceau", "Milu", "Ham", "Cuc", "Pam", "Dam", "Mumu", "Zuzu", "Gugu" }),
             new("Single", "Director", new List<string> { "Christopher Nolan", "Steven Spielberg" }),
             new("Multiple", "Actors", new List<string> { "Adam Sandler", "Zendaya" }),
             new("Single", "Duration",
-                new List<string> { "short (< 90 min)", "medium (90 min - 120 min)", "long (> 120 min)" }),
+                new List<string> { "short (< 90 min)", "medium (90 min - 120 min)", "long (> 120 min)" ,  "Ceva", "Altceva", "Miau", "Bau", "Ceau", "Milu", "Ham", "Cuc", "Pam", "Dam", "Mumu", "Zuzu", "Gugu"}),
             new("Single", "Year", new List<string> { "'80s", "'90s", "2000s", "2010s", "2020s" }),
             new("Single", "Rating", new List<string> { "> 9", "8-9", "7-8", "6-7", "< 6" }),
             new("Multiple", "Awards",

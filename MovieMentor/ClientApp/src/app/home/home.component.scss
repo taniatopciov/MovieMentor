@@ -33,16 +33,6 @@
   height: 100%;
 }
 
-.example-radio-group {
-  display: flex;
-  flex-direction: column;
-  margin: 15px 0;
-}
-
-.example-radio-button {
-  margin: 5px;
-}
-
 .back-button {
   margin-right: 8px;
   margin-top: 16px;
@@ -50,4 +40,30 @@
 
 .next-button {
   margin-top: 16px;
+}
+
+.single-step {
+  height: 100%;
+}
+
+.step-buttons {
+  margin-top:8px;
+}
+
+@media (min-width: 1440px) {
+  .step-buttons {
+    margin-top: 8px;
+  }
+}
+
+.rec-div {
+  overflow: auto;
+  height: 230px;
+}
+
+@media (min-width: 1440px) {
+  .rec-div {
+    overflow: auto;
+    height: 512px;
+  }
 }

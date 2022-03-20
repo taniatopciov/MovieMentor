@@ -1,21 +1,30 @@
 <div class="project-details-main-div">
   <mat-card>
     <mat-stepper class="stp" labelPosition="bottom" linear #stepper>
-      <mat-step *ngFor="let tag of tags; let i = index;">
+      <mat-step class="single-step" *ngFor="let tag of tags; let i = index;">
         <ng-template matStepLabel>{{tag.name}}</ng-template>
         <multiple-selection-list *ngIf="tag.type === 'Multiple'" [listData]="tag.values"
                                  (updateSelectedListItem)="onUpdateSelectedMultipleItems(tag.name, $event)"></multiple-selection-list>
         <single-selection-list *ngIf="tag.type === 'Single'" [listData]="tag.values"
                                (updateSelectedListItem)="onUpdateSelectedSingleItem(tag.name, $event)"></single-selection-list>
-        <div>
+        <div class="step-buttons">
           <button *ngIf="i > 0" class="back-button" mat-raised-button color="primary" matStepperPrevious>Back</button>
-          <button class="next-button" mat-raised-button color="primary" [disabled]="!options.has(tag.name) || options.get(tag.name)?.length == 0" matStepperNext>Next</button>
+          <button *ngIf="i == tags.length - 1" class="next-button" mat-raised-button color="primary"
+                  [disabled]="!options.has(tag.name) || options.get(tag.name)?.length == 0" (click)="onGetRecommendationButtonClick()" matStepperNext>Get
+            Recommendation
+          </button>
+          <button *ngIf="i < tags.length - 1" class="next-button" mat-raised-button color="primary"
+                  [disabled]="!options.has(tag.name) || options.get(tag.name)?.length == 0" matStepperNext>Next
+          </button>
         </div>
       </mat-step>
 
-      <mat-step>
-        <ng-template matStepLabel>Get recommandation</ng-template>
-        <div>
+      <mat-step class="single-step">
+        <ng-template matStepLabel>Recommendation</ng-template>
+        <div class="rec-div">
+          <mat-spinner color="accent" strokeWidth="4" [diameter]="150"></mat-spinner>
+        </div>
+        <div class="step-buttons">
           <button class="back-button" mat-raised-button color="primary" matStepperPrevious>Back</button>
         </div>
       </mat-step>

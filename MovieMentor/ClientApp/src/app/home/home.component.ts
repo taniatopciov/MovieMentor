@@ -1,6 +1,7 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {MoviesService} from "../services/movies-service/movies.service";
 import Tag from "../services/movies-service/tag";
+import ResponseChoices from "./responseChoices";
 
 @Component({
   selector: 'app-home',
@@ -12,23 +13,40 @@ export class HomeComponent implements OnInit {
   tags: Tag[] = [];
   options = new Map<string, string[]>();
 
-  constructor(private moviesService: MoviesService) {
+  constructor(private moviesService: MoviesService, private changeDetectorRef: ChangeDetectorRef) {
   }
 
   ngOnInit() {
     this.moviesService.getTags().subscribe(data => {
       this.tags = data;
-      console.log(this.tags.length);
-    })
+      this.changeDetectorRef.detectChanges();
+    });
   }
 
   onUpdateSelectedMultipleItems(tagName: string, selectedItems: string[]) {
-    // console.log(tagName + selectedItems);
     this.options.set(tagName, selectedItems);
   }
 
   onUpdateSelectedSingleItem(tagName: string, selectedItem: string) {
-    // console.log(tagName + selectedItem);
     this.options.set(tagName, [selectedItem]);
+  }
+
+  createOptionsObject() {
+    const selectedOptions: ResponseChoices[] = [];
+
+    this.options.forEach((values, key) => {
+      selectedOptions.push({
+        key, values
+      });
+    });
+
+    return selectedOptions;
+  }
+
+  onGetRecommendationButtonClick() {
+    this.moviesService.getRecommendation(this.createOptionsObject()).subscribe(data => {
+
+    });
+    console.log(this.createOptionsObject());
   }
 }
