@@ -2,6 +2,7 @@ import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {MoviesService} from "../services/movies-service/movies.service";
 import Tag from "../services/movies-service/tag";
 import ResponseChoices from "./responseChoices";
+import {MatStepper} from "@angular/material/stepper";
 
 @Component({
   selector: 'app-home',
@@ -12,6 +13,7 @@ export class HomeComponent implements OnInit {
 
   tags: Tag[] = [];
   options = new Map<string, string[]>();
+  panelOpenState = false;
 
   constructor(private moviesService: MoviesService, private changeDetectorRef: ChangeDetectorRef) {
   }
@@ -48,5 +50,13 @@ export class HomeComponent implements OnInit {
 
     });
     console.log(this.createOptionsObject());
+  }
+
+  goBack(stepper: MatStepper) {
+    stepper.previous();
+  }
+
+  goForward(stepper: MatStepper) {
+    stepper.next();
   }
 }

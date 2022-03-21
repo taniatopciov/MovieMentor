@@ -21,6 +21,7 @@ import {MatCardModule} from '@angular/material/card';
 import {MatListModule} from '@angular/material/list';
 import {MatRadioModule} from '@angular/material/radio';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatExpansionModule} from '@angular/material/expansion';
 
 import { MultipleSelectionListComponent } from './shared/multiple-selection-list/multiple-selection-list.component';
 import { SingleSelectionListComponent } from './shared/single-selection-list/single-selection-list.component';
@@ -53,7 +54,8 @@ import { SingleSelectionListComponent } from './shared/single-selection-list/sin
     MatCardModule,
     MatListModule,
     MatRadioModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatExpansionModule
   ],
   providers: [],
   bootstrap: [AppComponent]

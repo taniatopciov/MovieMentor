@@ -1,26 +1,33 @@
-.mat-stepper-horizontal {
-  margin-top: 8px;
-}
-
-.mat-form-field {
-  margin-top: 16px;
-}
-
-.project-details-main-div {
-  width: 100%;
-  flex-direction: column;
-  box-sizing: border-box;
-  display: flex;
-  place-content: center space-around;
-  align-items: center;
-  overflow: auto;
-}
-
 .mat-card {
   width: 80%;
-  height: 70vh;
-  margin-top: 4%;
-  margin-bottom: 4%;
+  height: calc(80% - 72px);
+  max-height: calc(80% - 72px);
+  margin: auto;
+  position: absolute;
+  top: calc(50% + 72px);
+  left: 50%;
+  transform: translate(-50%, calc(-50% - 36px));
+}
+
+.stp {
+  width: 100%;
+  height: calc(100% - 72px);
+  //max-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.back-button {
+  //margin-right: 16px;
+  //margin-top: 16px;
+}
+
+.next-button {
+  //margin-top: 16px;
+}
+
+.step-buttons {
+  //margin-top:16px;
   flex-direction: row;
   box-sizing: border-box;
   display: flex;
@@ -28,42 +35,20 @@
   align-items: center;
 }
 
-.stp {
-  width: 100%;
+
+//.rec-div {
+//  overflow: auto;
+//  height: 230px;
+//}
+
+:host ::ng-deep .mat-horizontal-content-container {
+  overflow-y: auto;
+  margin-right: 32px;
   height: 100%;
 }
 
-.back-button {
-  margin-right: 8px;
-  margin-top: 16px;
-}
-
-.next-button {
-  margin-top: 16px;
-}
-
-.single-step {
-  height: 100%;
-}
-
-.step-buttons {
-  margin-top:8px;
-}
-
-@media (min-width: 1440px) {
-  .step-buttons {
-    margin-top: 8px;
-  }
-}
-
-.rec-div {
-  overflow: auto;
-  height: 230px;
-}
-
-@media (min-width: 1440px) {
-  .rec-div {
-    overflow: auto;
-    height: 512px;
-  }
+:host ::ng-deep .mat-horizontal-stepper-content {
+  //height: 100%;
+  //max-height: 100%;
+  //background-color: black;
 }

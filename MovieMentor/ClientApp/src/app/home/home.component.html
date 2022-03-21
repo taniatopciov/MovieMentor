@@ -1,34 +1,59 @@
-<div class="project-details-main-div">
-  <mat-card>
-    <mat-stepper class="stp" labelPosition="bottom" linear #stepper>
-      <mat-step class="single-step" *ngFor="let tag of tags; let i = index;">
-        <ng-template matStepLabel>{{tag.name}}</ng-template>
-        <multiple-selection-list *ngIf="tag.type === 'Multiple'" [listData]="tag.values"
-                                 (updateSelectedListItem)="onUpdateSelectedMultipleItems(tag.name, $event)"></multiple-selection-list>
-        <single-selection-list *ngIf="tag.type === 'Single'" [listData]="tag.values"
-                               (updateSelectedListItem)="onUpdateSelectedSingleItem(tag.name, $event)"></single-selection-list>
-        <div class="step-buttons">
-          <button *ngIf="i > 0" class="back-button" mat-raised-button color="primary" matStepperPrevious>Back</button>
-          <button *ngIf="i == tags.length - 1" class="next-button" mat-raised-button color="primary"
-                  [disabled]="!options.has(tag.name) || options.get(tag.name)?.length == 0" (click)="onGetRecommendationButtonClick()" matStepperNext>Get
-            Recommendation
-          </button>
-          <button *ngIf="i < tags.length - 1" class="next-button" mat-raised-button color="primary"
-                  [disabled]="!options.has(tag.name) || options.get(tag.name)?.length == 0" matStepperNext>Next
-          </button>
-        </div>
-      </mat-step>
+<mat-card fxLayout="column" fxLayoutAlign="space-between start">
+  <mat-stepper class="stp" labelPosition="bottom" linear #stepper>
+    <mat-step *ngFor="let tag of tags; let i = index;">
+      <ng-template matStepLabel>{{tag.name}}</ng-template>
+      <multiple-selection-list *ngIf="tag.type === 'Multiple'" [listData]="tag.values"
+                               (updateSelectedListItem)="onUpdateSelectedMultipleItems(tag.name, $event)"></multiple-selection-list>
+      <single-selection-list *ngIf="tag.type === 'Single'" [listData]="tag.values"
+                             (updateSelectedListItem)="onUpdateSelectedSingleItem(tag.name, $event)"></single-selection-list>
+    </mat-step>
 
-      <mat-step class="single-step">
-        <ng-template matStepLabel>Recommendation</ng-template>
-        <div class="rec-div">
-          <mat-spinner color="accent" strokeWidth="4" [diameter]="150"></mat-spinner>
-        </div>
-        <div class="step-buttons">
-          <button class="back-button" mat-raised-button color="primary" matStepperPrevious>Back</button>
-        </div>
-      </mat-step>
-    </mat-stepper>
-  </mat-card>
-</div>
+    <mat-step>
+      <ng-template matStepLabel>Recommendation</ng-template>
+      <div class="rec-div">
+        <!--          <mat-spinner color="accent" strokeWidth="4" [diameter]="150"></mat-spinner>-->
+
+        <mat-accordion>
+          <mat-expansion-panel hideToggle>
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                This is the expansion title
+              </mat-panel-title>
+              <mat-panel-description>
+                This is a summary of the content
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <p>This is the primary content of the panel.</p>
+          </mat-expansion-panel>
+          <mat-expansion-panel (opened)="panelOpenState = true"
+                               (closed)="panelOpenState = false">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                Self aware panel
+              </mat-panel-title>
+              <mat-panel-description>
+                Currently I am {{panelOpenState ? 'open' : 'closed'}}
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <p>I'm visible because I am open</p>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+    </mat-step>
+  </mat-stepper>
+  <div class="step-buttons">
+    <button *ngIf="stepper.selectedIndex > 0" class="back-button" mat-raised-button color="primary"
+            (click)="goBack(stepper)">Back
+    </button>
+    <button *ngIf="stepper.selectedIndex === tags.length - 1"
+            [disabled]="!options.has(tags[stepper.selectedIndex].name) || options.get(tags[stepper.selectedIndex].name)?.length == 0"
+            class="next-button" mat-raised-button color="primary"
+            (click)="goForward(stepper); onGetRecommendationButtonClick()">Get Recommendation
+    </button>
+    <button *ngIf="stepper.selectedIndex < tags.length - 1"
+            [disabled]="!options.has(tags[stepper.selectedIndex].name) || options.get(tags[stepper.selectedIndex].name)?.length == 0"
+            class="next-button" mat-raised-button color="primary" (click)="goForward(stepper)">Next
+    </button>
+  </div>
+</mat-card>
 
