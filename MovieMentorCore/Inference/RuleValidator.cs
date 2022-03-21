@@ -33,7 +33,7 @@ public class RuleValidator
 
             switch (definition)
             {
-                case RuleDefinition.Composite(var definitionName, var definitionParameters, var definitionInstances)
+                case RuleDefinition.Composite(var (definitionName, definitionParameters), var definitionInstances)
                     when definitionName == name:
                 {
                     var allMatch = true;

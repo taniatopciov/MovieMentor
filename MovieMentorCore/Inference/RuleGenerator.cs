@@ -109,7 +109,7 @@ public class RuleGenerator
 
                     break;
 
-                case RuleDefinition.Composite(_, var definitionParameters, var ruleInstances):
+                case RuleDefinition.Composite(var (_, definitionParameters), var ruleInstances):
                     var definitionParameter = definitionParameters[stepParameterName];
 
                     switch (definitionParameter)
@@ -130,6 +130,7 @@ public class RuleGenerator
                                     continue;
                                 }
 
+                                // TODO fix link reference variable between composite rules - Add Test for internal reference parameters
                                 // todo check if missing nested reference values
                                 var desiredParameterNames = parametersList.Parameters
                                     .Where(pair => pair.Value is Parameter.Reference(var refIndex) && refIndex == index)

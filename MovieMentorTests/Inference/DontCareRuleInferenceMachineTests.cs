@@ -48,9 +48,9 @@ public class DontCareRuleInferenceMachineTests
     {
         // Temp(?0) = Category(_, ?0), Number(?0) 
         // Temp(?0) = [[One], [Two]]
-        var ruleDefinition = new RuleDefinition.Composite("Temp", new ParameterList.Builder()
+        var ruleDefinition = new RuleDefinition.Composite(new RuleDefinition.Instance("Temp", new ParameterList.Builder()
                 .AddParameter("Result", new Parameter.Reference(0))
-                .Build(),
+                .Build()),
             new List<RuleDefinition.Instance>
             {
                 new("Category", new ParameterList.Builder()

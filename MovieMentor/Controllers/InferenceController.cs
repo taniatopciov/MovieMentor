@@ -44,7 +44,7 @@ public static class InferenceController
         var country = recommendationDto.GetSingleValue(KnowledgeBaseLoader.CountryChoice);
         Parameter countryParameter = country == null ? new Parameter.DontCare() : new Parameter.SingleValue(country);
 
-        return Rules.Rules.SearchMovieInstance(
+        return Rules.SearchMovieInstance(
             new Parameter.Reference(0),
             yearParameter,
             ratingParameter,
