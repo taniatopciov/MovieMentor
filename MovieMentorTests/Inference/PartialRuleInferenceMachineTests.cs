@@ -69,7 +69,7 @@ public class PartialRuleInferenceMachineTests
         var possibilities = _sut.Infer(ruleInstance);
 
         Assert.Single(possibilities);
-        Assert.Single(possibilities[0].Parameters);
+        Assert.Single(possibilities[0]);
         Assert.Equal("Value1", (possibilities[0]["Name"] as Parameter.SingleValue)!.Value);
     }
 
@@ -102,7 +102,7 @@ public class PartialRuleInferenceMachineTests
         Assert.Equal(2, possibilities.Count);
         foreach (var parameterList in possibilities)
         {
-            Assert.Single(parameterList.Parameters);
+            Assert.Single(parameterList);
         }
 
         Assert.Equal("true", (possibilities[0]["Name"] as Parameter.SingleValue)!.Value);
@@ -138,7 +138,7 @@ public class PartialRuleInferenceMachineTests
         Assert.Equal(3, possibilities.Count);
         foreach (var parameterList in possibilities)
         {
-            Assert.Single(parameterList.Parameters);
+            Assert.Single(parameterList);
         }
 
         Assert.Equal("Value1", (possibilities[0]["Name"] as Parameter.SingleValue)!.Value);

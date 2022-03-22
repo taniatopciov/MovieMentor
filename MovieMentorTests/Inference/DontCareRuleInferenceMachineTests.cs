@@ -72,7 +72,7 @@ public class DontCareRuleInferenceMachineTests
         Assert.Equal(2, possibilities.Count);
         foreach (var parameterList in possibilities)
         {
-            Assert.Single(parameterList.Parameters);
+            Assert.Single(parameterList);
         }
 
         Assert.Equal("One", (possibilities[0]["Result"] as Parameter.SingleValue)!.Value);

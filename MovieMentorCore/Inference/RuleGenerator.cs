@@ -7,14 +7,6 @@ public class RuleGenerator
     private readonly IDictionary<string, IList<RuleDefinition>> _allDefinitions;
     private readonly RuleValidator _ruleValidator;
 
-    private readonly List<ParameterList> _possibilities = new();
-    private readonly IList<IList<Parameter>> _parameterPossibilities = new List<IList<Parameter>>();
-
-    private ParameterList _current = ParameterList.Empty();
-    private IList<RuleDefinition> _currentDefinitions = new List<RuleDefinition>();
-    private RuleDefinition.Instance _targetRuleInstance = new("", ParameterList.Empty());
-    private IList<string> _targetParameterNames = Array.Empty<string>();
-
     public RuleGenerator(IDictionary<string, IList<RuleDefinition>> allDefinitions, RuleValidator ruleValidator)
     {
         _allDefinitions = allDefinitions;
@@ -23,8 +15,15 @@ public class RuleGenerator
 
     public IList<ParameterList> Generate(RuleDefinition.Instance ruleInstance)
     {
-        _targetRuleInstance = ruleInstance;
-        var (name, parameters) = ruleInstance;
+        var (name, parameterList) = ruleInstance;
+
+        if (!parameterList.HasReferences)
+        {
+            return _ruleValidator.Validate(ruleInstance)
+                ? new List<ParameterList> { parameterList }
+                : new List<ParameterList>();
+        }
+
         if (!_allDefinitions.TryGetValue(name, out var definitions))
         {
             return new List<ParameterList>();
@@ -32,163 +31,319 @@ public class RuleGenerator
 
         // later rules overloading
         // definitions = definitions.Where(r => r.ParameterCount == parameters.Count).ToList();
-        if (definitions.Count == 0 || parameters.Count == 0)
+        if (definitions.Count == 0 || parameterList.Count == 0)
         {
             return new List<ParameterList>();
         }
 
-        _currentDefinitions = definitions;
-        _current = parameters;
-        _targetParameterNames = parameters.Parameters.Keys.ToList();
-
-        for (var i = 0; i < parameters.Count; i++)
-        {
-            _parameterPossibilities.Add(GetPossibilities(i));
-        }
-
-        Back(0);
-
-        return _possibilities;
+        return GenerateConcreteInstances(ruleInstance)
+            .Select(r => r.ParametersList)
+            .ToList();
     }
 
-    private void Back(int step)
+    private IEnumerable<RuleDefinition.Instance> GenerateConcreteInstances(RuleDefinition.Instance inputRuleInstance)
     {
-        if (step >= _current.Count)
+        if (!inputRuleInstance.ParametersList.HasReferences)
         {
-            return;
-        }
-
-        foreach (var possibility in _parameterPossibilities[step])
-        {
-            _current[_targetParameterNames[step]] = possibility;
-            if (!Valid(step))
+            if (_ruleValidator.Validate(inputRuleInstance))
             {
-                continue;
+                yield return inputRuleInstance;
             }
 
-            if (Solution(step))
-            {
-                _possibilities.Add(_current.Copy());
-            }
-            else
-            {
-                Back(step + 1);
-            }
-        }
-    }
-
-    private List<Parameter> GetPossibilities(int step)
-    {
-        var stepParameterName = _targetParameterNames[step];
-        var stepParameter = _targetRuleInstance.ParametersList[stepParameterName];
-        if (stepParameter is Parameter.SingleValue or Parameter.MultipleValues)
-        {
-            return new List<Parameter>
-            {
-                stepParameter
-            };
+            yield break;
         }
 
-        var possibilities = new List<Parameter>();
-        foreach (var currentDefinition in _currentDefinitions)
+        if (!_allDefinitions.TryGetValue(inputRuleInstance.Name, out var definitions))
         {
-            switch (currentDefinition)
-            {
-                case RuleDefinition.Instance(_, var parameters):
+            yield break;
+        }
 
-                    var currentParameter = parameters[stepParameterName];
-                    if (currentParameter == null)
+        foreach (var definition in definitions)
+        {
+            switch (definition)
+            {
+                case RuleDefinition.Instance instance:
+                    if (!instance.ParametersList.HasReferences)
                     {
-                        continue;
-                    }
-
-                    if (currentParameter is Parameter.SingleValue or Parameter.MultipleValues)
-                    {
-                        possibilities.Add(currentParameter);
+                        var concreteInstance = SetReferenceParametersOfInstance(inputRuleInstance, instance);
+                        if (concreteInstance != null)
+                        {
+                            yield return concreteInstance;
+                        }
                     }
 
                     break;
 
-                case RuleDefinition.Composite(var (_, definitionParameters), var ruleInstances):
-                    var definitionParameter = definitionParameters[stepParameterName];
+                case RuleDefinition.Composite(var instance, var instanceDefinitions):
 
-                    switch (definitionParameter)
-                    {
-                        case Parameter.SingleValue:
-                        case Parameter.MultipleValues:
-                            possibilities.Add(definitionParameter);
-                            break;
-
-                        case Parameter.Reference(var index):
+                    var backtracking = new Backtracking<RuleDefinition.Instance>(instanceDefinitions.Count,
+                        (step, current) =>
                         {
-                            var possibilitiesSetList = new List<HashSet<Parameter>>();
-
-                            foreach (var (name, parametersList) in ruleInstances)
+                            if (step >= current.Length)
                             {
-                                if (!_allDefinitions.TryGetValue(name, out var ruleInstanceDefinitions))
+                                return false;
+                            }
+
+                            return EnsureAllReferenceParametersWithTheSameIndexAreEqual(instanceDefinitions, step,
+                                current);
+                        },
+                        (step, current) => step == current.Length - 1,
+                        step =>
+                        {
+                            var generateConcreteInstances =
+                                GenerateConcreteInstances(instanceDefinitions[step]).ToList();
+                            // based on the input rule, validate the rule parameters with the provided concrete parameters
+
+                            var newList = new List<RuleDefinition.Instance>();
+
+                            var instanceDefinition = instanceDefinitions[step];
+
+                            foreach (var generatedDefinition in generateConcreteInstances)
+                            {
+                                var shouldAddDefinition = true;
+                                foreach (var (generatedParameterName, generatedParameter) in generatedDefinition
+                                             .ParametersList)
                                 {
-                                    continue;
+                                    var instanceDefinitionParameter =
+                                        instanceDefinition.ParametersList[generatedParameterName];
+                                    if (instanceDefinitionParameter == null)
+                                    {
+                                        shouldAddDefinition = false;
+                                        break;
+                                    }
+
+                                    if (instanceDefinitionParameter is Parameter.SingleValue(var value))
+                                    {
+                                        if (generatedParameter is not Parameter.SingleValue(var generatedValue))
+                                        {
+                                            shouldAddDefinition = false;
+                                            break;
+                                        }
+
+                                        if (value != generatedValue)
+                                        {
+                                            shouldAddDefinition = false;
+                                            break;
+                                        }
+                                    }
+                                    else if (instanceDefinitionParameter is Parameter.MultipleValues(var values))
+                                    {
+                                        if (generatedParameter is not Parameter.MultipleValues(var generatedValues))
+                                        {
+                                            shouldAddDefinition = false;
+                                            break;
+                                        }
+
+                                        if (values != generatedValues)
+                                        {
+                                            shouldAddDefinition = false;
+                                            break;
+                                        }
+                                    }
+                                    else if (instanceDefinitionParameter is Parameter.Reference(var index))
+                                    {
+                                        var instanceParameter = instance.ParametersList.FirstOrDefault(p =>
+                                            p.Value is Parameter.Reference(var instanceIndex) &&
+                                            instanceIndex == index);
+
+                                        if (instanceParameter.Key != default) // it can happen
+                                        {
+                                            var providedParameter =
+                                                inputRuleInstance.ParametersList[instanceParameter.Key];
+                                            if (providedParameter is Parameter.SingleValue(var providedValue))
+                                            {
+                                                if (generatedParameter is not Parameter.SingleValue(var generatedValue))
+                                                {
+                                                    shouldAddDefinition = false;
+                                                    break;
+                                                }
+
+                                                if (providedValue != generatedValue)
+                                                {
+                                                    shouldAddDefinition = false;
+                                                    break;
+                                                }
+                                            }
+                                            else if (providedParameter is Parameter.MultipleValues(var providedValues))
+                                            {
+                                                if (generatedParameter is not Parameter.MultipleValues(var
+                                                    generatedValues))
+                                                {
+                                                    shouldAddDefinition = false;
+                                                    break;
+                                                }
+
+                                                if (providedValues != generatedValues)
+                                                {
+                                                    shouldAddDefinition = false;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
 
-                                // TODO fix link reference variable between composite rules - Add Test for internal reference parameters
-                                // todo check if missing nested reference values
-                                var desiredParameterNames = parametersList.Parameters
-                                    .Where(pair => pair.Value is Parameter.Reference(var refIndex) && refIndex == index)
-                                    .Select(pair => pair.Key)
-                                    .ToList();
-
-                                foreach (var parameterName in desiredParameterNames)
+                                if (shouldAddDefinition)
                                 {
-                                    var possibilitiesSet = new HashSet<Parameter>();
-                                    foreach (var ruleDefinition in ruleInstanceDefinitions)
+                                    newList.Add(generatedDefinition);
+                                }
+                            }
+
+                            return newList;
+                        });
+
+                    foreach (var instanceDefinitionsPossibilities in backtracking.GetSolutions())
+                    {
+                        // construct concrete the rule based on the definitions
+
+                        var (instanceName, instanceParameterList) = instance;
+
+                        var parameterListBuilder = new ParameterList.Builder();
+
+                        foreach (var (parameterName, parameter) in instanceParameterList)
+                        {
+                            if (parameter is Parameter.Reference(var index))
+                            {
+                                // search for value in instanceDefinitionsPossibilities
+                                Parameter? concreteParameter = null;
+                                for (var i = 0; i < instanceDefinitionsPossibilities.Length; i++)
+                                {
+                                    foreach (var pair in instanceDefinitions[i].ParametersList)
                                     {
-                                        var parameter = ruleDefinition.ParametersList[parameterName];
-                                        if (parameter is Parameter.SingleValue or Parameter.MultipleValues)
+                                        if (pair.Value is Parameter.Reference(var refIndex) && refIndex == index)
                                         {
-                                            possibilitiesSet.Add(parameter);
+                                            concreteParameter = instanceDefinitionsPossibilities[i]
+                                                .ParametersList[pair.Key];
+                                            if (concreteParameter != null)
+                                            {
+                                                break;
+                                            }
                                         }
                                     }
 
-                                    possibilitiesSetList.Add(possibilitiesSet);
+                                    if (concreteParameter != null)
+                                    {
+                                        break;
+                                    }
+                                }
+
+                                if (concreteParameter != null)
+                                {
+                                    parameterListBuilder.AddParameter(parameterName, concreteParameter);
+                                }
+                                else
+                                {
+                                    break;
                                 }
                             }
-
-                            if (possibilitiesSetList.Count > 0)
+                            else
                             {
-                                var intersectedPossibilitiesSet = possibilitiesSetList
-                                    .Skip(1)
-                                    .Aggregate(new HashSet<Parameter>(possibilitiesSetList.First()),
-                                        (h, e) =>
-                                        {
-                                            h.IntersectWith(e);
-                                            return h;
-                                        });
-                                possibilities.AddRange(intersectedPossibilitiesSet);
+                                parameterListBuilder.AddParameter(parameterName, parameter);
                             }
+                        }
 
-                            break;
+                        var parametersList = parameterListBuilder.Build();
+                        if (parametersList.Count == instanceParameterList.Count)
+                        {
+                            var updatedInstance = new RuleDefinition.Instance(instanceName, parametersList);
+                            yield return updatedInstance;
                         }
                     }
 
                     break;
             }
         }
-
-        return possibilities;
     }
 
-    private bool Valid(int step)
+    private bool EnsureAllReferenceParametersWithTheSameIndexAreEqual(
+        IList<RuleDefinition.Instance> instanceDefinitions, int step, RuleDefinition.Instance[] instancePossibilities)
     {
-        return step < _current.Count;
-    }
-
-    private bool Solution(int step)
-    {
-        if (step != _current.Count - 1)
+        var possibilityFromInstance =
+            SetReferenceParametersOfInstance(instanceDefinitions[step], instancePossibilities[step]);
+        if (possibilityFromInstance == null)
         {
             return false;
         }
 
-        return _ruleValidator.Validate(new RuleDefinition.Instance(_targetRuleInstance.Name, _current));
+        foreach (var (instanceParameterName, instanceParameter) in instanceDefinitions[step].ParametersList)
+        {
+            if (instanceParameter is not Parameter.Reference reference)
+            {
+                continue;
+            }
+
+            var concreteParameter = instancePossibilities[step].ParametersList[instanceParameterName];
+            if (concreteParameter == null)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < step; i++)
+            {
+                foreach (var (previousParameterName, previousParameter) in instanceDefinitions[i].ParametersList)
+                {
+                    if (previousParameter is not Parameter.Reference(var refIndex) ||
+                        reference.Index != refIndex)
+                    {
+                        continue;
+                    }
+
+                    var concretePreviousParameter =
+                        instancePossibilities[i].ParametersList[previousParameterName];
+                    if (concretePreviousParameter == null)
+                    {
+                        return false;
+                    }
+
+                    if (concreteParameter is Parameter.SingleValue(var value) &&
+                        concretePreviousParameter is Parameter.SingleValue(var previousValue) &&
+                        value == previousValue)
+                    {
+                        continue;
+                    }
+
+                    if (concreteParameter is Parameter.MultipleValues(var values) &&
+                        concretePreviousParameter is Parameter.MultipleValues(var previousValues) &&
+                        values == previousValues)
+                    {
+                        continue;
+                    }
+
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private RuleDefinition.Instance? SetReferenceParametersOfInstance(RuleDefinition.Instance inputRuleInstance,
+        RuleDefinition.Instance instance)
+    {
+        var (instanceName, instanceParameterList) = instance;
+
+        var parameterListBuilder = new ParameterList.Builder();
+
+        // iterate over all input parameters
+        // if the parameter is reference, replace it with the concrete version
+        // if the parameter is concrete, use it
+        foreach (var (parameterName, parameter) in inputRuleInstance.ParametersList)
+        {
+            if (parameter is Parameter.Reference)
+            {
+                var concreteParameter = instanceParameterList[parameterName];
+                if (concreteParameter != null)
+                {
+                    parameterListBuilder.AddParameter(parameterName, concreteParameter);
+                }
+            }
+            else
+            {
+                parameterListBuilder.AddParameter(parameterName, parameter);
+            }
+        }
+
+        var updatedInstance = new RuleDefinition.Instance(instanceName, parameterListBuilder.Build());
+        return _ruleValidator.Validate(updatedInstance) ? updatedInstance : null;
     }
 }

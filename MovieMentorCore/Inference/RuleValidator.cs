@@ -47,14 +47,13 @@ public class RuleValidator
 
                         // replace instanceParameterList reference parameters with the provided parameters
 
-                        foreach (var (parameterName, parameter) in instanceParameterList.Parameters)
+                        foreach (var (parameterName, parameter) in instanceParameterList)
                         {
                             if (parameter is Parameter.Reference(var index))
                             {
                                 // search in definition for reference parameter with index
-                                var definitionReferenceParameterName = definitionParameters.Parameters
-                                    .FirstOrDefault(pair =>
-                                        pair.Value is Parameter.Reference(var refIndex) && refIndex == index).Key;
+                                var definitionReferenceParameterName = definitionParameters.FirstOrDefault(pair =>
+                                    pair.Value is Parameter.Reference(var refIndex) && refIndex == index).Key;
                                 if (definitionReferenceParameterName == default) // it can be null
                                 {
                                     updatedParameterListBuilder =
@@ -113,7 +112,7 @@ public class RuleValidator
                 {
                     var allMatch = true;
 
-                    foreach (var (parameterName, parameter) in parameterList.Parameters)
+                    foreach (var (parameterName, parameter) in parameterList)
                     {
                         var concreteParam = concreteParametersList[parameterName];
                         if (concreteParam == null)
