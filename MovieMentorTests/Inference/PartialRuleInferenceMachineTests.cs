@@ -47,9 +47,10 @@ public class PartialRuleInferenceMachineTests
     {
         // Temp(?0) = Category(?0), Tag(?0) 
         // Temp(?0) = [[Value1]]
-        var ruleDefinition = new RuleDefinition.Composite("Temp", new ParameterList.Builder()
-                .AddParameter("Name", new Parameter.Reference(0))
-                .Build(),
+        var ruleDefinition = new RuleDefinition.Composite(new RuleDefinition.Instance("Temp",
+                new ParameterList.Builder()
+                    .AddParameter("Name", new Parameter.Reference(0))
+                    .Build()),
             new List<RuleDefinition.Instance>
             {
                 new("Category", new ParameterList.Builder()
@@ -68,7 +69,7 @@ public class PartialRuleInferenceMachineTests
         var possibilities = _sut.Infer(ruleInstance);
 
         Assert.Single(possibilities);
-        Assert.Single(possibilities[0].Parameters);
+        Assert.Single(possibilities[0]);
         Assert.Equal("Value1", (possibilities[0]["Name"] as Parameter.SingleValue)!.Value);
     }
 
@@ -77,9 +78,10 @@ public class PartialRuleInferenceMachineTests
     {
         // Temp(?0) = Category(Value2), Tag(?0) 
         // (?0) = Temp(?0) = [[true], [Value1]]
-        var ruleDefinition = new RuleDefinition.Composite("Temp", new ParameterList.Builder()
-                .AddParameter("Name", new Parameter.Reference(0))
-                .Build(),
+        var ruleDefinition = new RuleDefinition.Composite(new RuleDefinition.Instance("Temp",
+                new ParameterList.Builder()
+                    .AddParameter("Name", new Parameter.Reference(0))
+                    .Build()),
             new List<RuleDefinition.Instance>
             {
                 new("Category", new ParameterList.Builder()
@@ -100,7 +102,7 @@ public class PartialRuleInferenceMachineTests
         Assert.Equal(2, possibilities.Count);
         foreach (var parameterList in possibilities)
         {
-            Assert.Single(parameterList.Parameters);
+            Assert.Single(parameterList);
         }
 
         Assert.Equal("true", (possibilities[0]["Name"] as Parameter.SingleValue)!.Value);
@@ -112,9 +114,10 @@ public class PartialRuleInferenceMachineTests
     {
         // Temp(?0) = Category(?0), Tag(true) 
         // Temp(?0) = [[Value1], [Value2], [Value3]]
-        var ruleDefinition = new RuleDefinition.Composite("Temp", new ParameterList.Builder()
-                .AddParameter("Name", new Parameter.Reference(0))
-                .Build(),
+        var ruleDefinition = new RuleDefinition.Composite(new RuleDefinition.Instance("Temp",
+                new ParameterList.Builder()
+                    .AddParameter("Name", new Parameter.Reference(0))
+                    .Build()),
             new List<RuleDefinition.Instance>
             {
                 new("Category", new ParameterList.Builder()
@@ -135,7 +138,7 @@ public class PartialRuleInferenceMachineTests
         Assert.Equal(3, possibilities.Count);
         foreach (var parameterList in possibilities)
         {
-            Assert.Single(parameterList.Parameters);
+            Assert.Single(parameterList);
         }
 
         Assert.Equal("Value1", (possibilities[0]["Name"] as Parameter.SingleValue)!.Value);
@@ -148,9 +151,10 @@ public class PartialRuleInferenceMachineTests
     {
         // Temp(?0) = Category(Value2), Tag(Value1) 
         // (?0) = Temp(?0) = []
-        var ruleDefinition = new RuleDefinition.Composite("Temp", new ParameterList.Builder()
-                .AddParameter("Name", new Parameter.Reference(0))
-                .Build(),
+        var ruleDefinition = new RuleDefinition.Composite(new RuleDefinition.Instance("Temp",
+                new ParameterList.Builder()
+                    .AddParameter("Name", new Parameter.Reference(0))
+                    .Build()),
             new List<RuleDefinition.Instance>
             {
                 new("Category", new ParameterList.Builder()

@@ -1,10 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MovieMentor.DAL;
 using MovieMentor.DTO;
-using MovieMentor.Rules;
 using MovieMentorCore.Data;
 using MovieMentorCore.Models;
-using static MovieMentor.Rules.Rules;
 using ValueType = MovieMentorCore.Data.ValueType;
 
 namespace MovieMentor.Services;
@@ -20,19 +18,28 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
     public const string AwardsChoice = "Awards";
     public const string CountryChoice = "Country";
 
-    private static readonly PredicateRule DurationPredicateRule =
-        new PredicateRule.Builder("DurationRange", "long (> 120 min)")
+    private static readonly PredicateRule<int> DurationPredicateRule =
+        new PredicateRule<int>.Builder(Rules.DurationRangeRule, "long (> 120 min)")
             .AddChoice("short (< 90 min)", v => v < 90)
             .AddChoice("medium (90 min - 120 min)", v => v is >= 90 and < 120)
             .Build();
 
-    private static readonly PredicateRule YearPredicateRule = new PredicateRule.Builder("YearRange", "Other")
-        .AddChoice("'80", y => y is >= 1980 and < 1990)
-        .AddChoice("'90", y => y is >= 1990 and < 2000)
-        .AddChoice("2000s", y => y is >= 2000 and < 2010)
-        .AddChoice("2010s", y => y is >= 2010 and < 2020)
-        .AddChoice("2020s", y => y is >= 2020 and < 2030)
-        .Build();
+    private static readonly PredicateRule<int> YearPredicateRule =
+        new PredicateRule<int>.Builder(Rules.YearRangeRule, "Other")
+            .AddChoice("'80", y => y is >= 1980 and < 1990)
+            .AddChoice("'90", y => y is >= 1990 and < 2000)
+            .AddChoice("2000s", y => y is >= 2000 and < 2010)
+            .AddChoice("2010s", y => y is >= 2010 and < 2020)
+            .AddChoice("2020s", y => y is >= 2020 and < 2030)
+            .Build();
+
+    private static readonly PredicateRule<double> RatingPredicateRule =
+        new PredicateRule<double>.Builder(Rules.RatingRangeRule, "< 6")
+            .AddChoice("> 9", r => r >= 9.0)
+            .AddChoice("8-9", r => r is >= 8.0 and < 9.0)
+            .AddChoice("7-8", r => r is >= 7.0 and < 8.0)
+            .AddChoice("6-7", r => r is >= 6.0 and < 7.0)
+            .Build();
 
     private readonly MovieContext _movieContext;
 
@@ -50,7 +57,7 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
             // new(nameof(ValueType.Multiple), ActorsChoice, _movieContext.Actors.Select(a => a.Name).ToList()),
             new(nameof(ValueType.Single), DurationChoice, DurationPredicateRule.GetLabels()),
             new(nameof(ValueType.Single), YearChoice, YearPredicateRule.GetLabels()),
-            new(nameof(ValueType.Single), RatingChoice, new List<string> { "> 9", "8-9", "7-8", "6-7", "< 6" }),
+            new(nameof(ValueType.Single), RatingChoice, RatingPredicateRule.GetLabels()),
             // new(nameof(ValueType.Multiple), AwardsChoice, _movieContext.Awards.Select(a => a.Name).ToList()),
             new(nameof(ValueType.Single), CountryChoice, _movieContext.Countries.Select(c => c.Name).ToList()),
         };
@@ -60,6 +67,7 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
     {
         var durationRange = new List<RuleDefinition>();
         var yearRange = new List<RuleDefinition>();
+        var ratingRange = new List<RuleDefinition>();
 
         var moviesDefinitions = _movieContext.Movies
             .Include(movie => movie.Actors).ThenInclude(a => a.Country)
@@ -67,44 +75,47 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
             .Include(nameof(Movie.Country))
             .Include(nameof(Movie.Directors))
             .Include(nameof(Movie.Genres))
-            .Select(m => MovieDefinition(m.ID.ToString(), m.Title,
-                AddYearRange(yearRange, m.Year).ToString(), m.Rating,
+            .Select(m => Rules.MovieDefinition(m.ID.ToString(), m.Title,
+                AddYearRange(yearRange, m.Year).ToString(), AddRatingRange(ratingRange, m.Rating),
                 AddDurationRange(durationRange, m.Duration).ToString(), m.Country.Name))
             .Cast<RuleDefinition>()
             .ToList();
 
 
         var genreDefinition = _movieContext.Genres
-            .Select(g => GenreDefinition(g.Name))
+            .Select(g => Rules.GenreDefinition(g.Name))
             .Cast<RuleDefinition>()
             .ToList();
 
         var countryDefinition = _movieContext.Countries
-            .Select(c => CountryDefinition(c.Name))
+            .Select(c => Rules.CountryDefinition(c.Name))
             .Cast<RuleDefinition>()
             .ToList();
 
         return new Dictionary<string, IList<RuleDefinition>>
         {
             {
-                "Movie", moviesDefinitions
+                Rules.MovieRule, moviesDefinitions
             },
             {
-                "Genre", genreDefinition
+                Rules.GenreRule, genreDefinition
             },
             {
-                "Country", countryDefinition
+                Rules.CountryRule, countryDefinition
             },
             {
-                "DurationRange", durationRange
+                DurationPredicateRule.Name, durationRange
             },
             {
-                "YearRange", yearRange
+                YearPredicateRule.Name, yearRange
             },
             {
-                "SearchMovie", new List<RuleDefinition>
+                RatingPredicateRule.Name, ratingRange
+            },
+            {
+                Rules.SearchMovieRule, new List<RuleDefinition>
                 {
-                    SearchMovieDefinition(),
+                    Rules.SearchMovieDefinition(),
                 }
             }
         };
@@ -118,7 +129,7 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
         }
 
         var label = DurationPredicateRule.Evaluate(value);
-        definitions.Add(DurationRangeDefinition(label, value.ToString()));
+        definitions.Add(Rules.DurationRangeDefinition(label, value.ToString()));
 
         return value;
     }
@@ -131,7 +142,25 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
         }
 
         var label = YearPredicateRule.Evaluate(value);
-        definitions.Add(YearRangeDefinition(label, value.ToString()));
+        definitions.Add(Rules.YearRangeDefinition(label, value.ToString()));
+
+        return value;
+    }
+
+    private static string AddRatingRange(ICollection<RuleDefinition> definitions, string value)
+    {
+        if (definitions.Any(d => d.ParametersList[value] != null))
+        {
+            return value;
+        }
+
+        if (!double.TryParse(value, out var parsedValue))
+        {
+            return value;
+        }
+
+        var label = RatingPredicateRule.Evaluate(parsedValue);
+        definitions.Add(Rules.RatingRangeDefinition(label, value));
 
         return value;
     }
