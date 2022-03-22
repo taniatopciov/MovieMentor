@@ -7,4 +7,6 @@ public class Actor
     public string Name { get; set; }
 
     public Country Country { get; set; }
+
+    protected virtual List<Movie> Movies { get; set; }
 }

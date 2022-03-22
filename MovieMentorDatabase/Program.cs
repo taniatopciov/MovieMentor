@@ -20,10 +20,10 @@ try
 
     // await movieContext.Database.EnsureDeletedAsync();
     await DbInitializer.Initialize(movieContext);
+
+    Console.WriteLine("Done.");
 }
 catch (Exception e)
 {
     Console.Error.WriteLine("An error occured creating the DB. {0}", e);
 }
-
-Console.WriteLine("Done.");
