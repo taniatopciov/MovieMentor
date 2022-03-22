@@ -90,106 +90,99 @@ public class RuleGenerator
                         (step, current) => step == current.Length - 1,
                         step =>
                         {
-                            var generateConcreteInstances =
-                                GenerateConcreteInstances(instanceDefinitions[step]).ToList();
                             // based on the input rule, validate the rule parameters with the provided concrete parameters
 
-                            var newList = new List<RuleDefinition.Instance>();
-
-                            var instanceDefinition = instanceDefinitions[step];
-
-                            foreach (var generatedDefinition in generateConcreteInstances)
-                            {
-                                var shouldAddDefinition = true;
-                                foreach (var (generatedParameterName, generatedParameter) in generatedDefinition
-                                             .ParametersList)
+                            return GenerateConcreteInstances(instanceDefinitions[step])
+                                .Where(generatedDefinition =>
                                 {
-                                    var instanceDefinitionParameter =
-                                        instanceDefinition.ParametersList[generatedParameterName];
-                                    if (instanceDefinitionParameter == null)
+                                    foreach (var (generatedParameterName, generatedParameter) in generatedDefinition
+                                                 .ParametersList)
                                     {
-                                        shouldAddDefinition = false;
-                                        break;
-                                    }
-
-                                    if (instanceDefinitionParameter is Parameter.SingleValue(var value))
-                                    {
-                                        if (generatedParameter is not Parameter.SingleValue(var generatedValue))
+                                        switch (instanceDefinitions[step].ParametersList[generatedParameterName])
                                         {
-                                            shouldAddDefinition = false;
-                                            break;
-                                        }
-
-                                        if (value != generatedValue)
-                                        {
-                                            shouldAddDefinition = false;
-                                            break;
-                                        }
-                                    }
-                                    else if (instanceDefinitionParameter is Parameter.MultipleValues(var values))
-                                    {
-                                        if (generatedParameter is not Parameter.MultipleValues(var generatedValues))
-                                        {
-                                            shouldAddDefinition = false;
-                                            break;
-                                        }
-
-                                        if (values != generatedValues)
-                                        {
-                                            shouldAddDefinition = false;
-                                            break;
-                                        }
-                                    }
-                                    else if (instanceDefinitionParameter is Parameter.Reference(var index))
-                                    {
-                                        var instanceParameter = instance.ParametersList.FirstOrDefault(p =>
-                                            p.Value is Parameter.Reference(var instanceIndex) &&
-                                            instanceIndex == index);
-
-                                        if (instanceParameter.Key != default) // it can happen
-                                        {
-                                            var providedParameter =
-                                                inputRuleInstance.ParametersList[instanceParameter.Key];
-                                            if (providedParameter is Parameter.SingleValue(var providedValue))
+                                            case null:
+                                                return false;
+                                            case Parameter.SingleValue(var value):
                                             {
                                                 if (generatedParameter is not Parameter.SingleValue(var generatedValue))
                                                 {
-                                                    shouldAddDefinition = false;
-                                                    break;
+                                                    return false;
                                                 }
 
-                                                if (providedValue != generatedValue)
+                                                if (value != generatedValue)
                                                 {
-                                                    shouldAddDefinition = false;
-                                                    break;
+                                                    return false;
                                                 }
+
+                                                break;
                                             }
-                                            else if (providedParameter is Parameter.MultipleValues(var providedValues))
+                                            case Parameter.MultipleValues(var values):
                                             {
                                                 if (generatedParameter is not Parameter.MultipleValues(var
                                                     generatedValues))
                                                 {
-                                                    shouldAddDefinition = false;
-                                                    break;
+                                                    return false;
                                                 }
 
-                                                if (providedValues != generatedValues)
+                                                if (values != generatedValues)
                                                 {
-                                                    shouldAddDefinition = false;
-                                                    break;
+                                                    return false;
                                                 }
+
+                                                break;
+                                            }
+                                            case Parameter.Reference(var index):
+                                            {
+                                                var instanceParameterName = instance.ParametersList.FirstOrDefault(p =>
+                                                    p.Value is Parameter.Reference(var instanceIndex) &&
+                                                    instanceIndex == index).Key;
+
+                                                if (instanceParameterName != default) // it can happen
+                                                {
+                                                    var providedParameter = inputRuleInstance.ParametersList[instanceParameterName];
+                                                    switch (providedParameter)
+                                                    {
+                                                        case Parameter.SingleValue(var providedValue):
+                                                        {
+                                                            if (generatedParameter is not Parameter.SingleValue(var
+                                                                generatedValue))
+                                                            {
+                                                                return false;
+                                                            }
+
+                                                            if (providedValue != generatedValue)
+                                                            {
+                                                                return false;
+                                                            }
+
+                                                            break;
+                                                        }
+                                                        case Parameter.MultipleValues(var
+                                                            providedValues):
+                                                        {
+                                                            if (generatedParameter is not Parameter.MultipleValues(var
+                                                                generatedValues))
+                                                            {
+                                                                return false;
+                                                            }
+
+                                                            if (providedValues != generatedValues)
+                                                            {
+                                                                return false;
+                                                            }
+
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+
+                                                break;
                                             }
                                         }
                                     }
-                                }
 
-                                if (shouldAddDefinition)
-                                {
-                                    newList.Add(generatedDefinition);
-                                }
-                            }
-
-                            return newList;
+                                    return true;
+                                });
                         });
 
                     foreach (var instanceDefinitionsPossibilities in backtracking.GetSolutions())
