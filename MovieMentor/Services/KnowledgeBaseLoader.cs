@@ -52,13 +52,13 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
     {
         return new List<ChoiceDto>
         {
-            // new(nameof(ValueType.Multiple), GenreChoice, _movieContext.Genres.Select(g => g.Name).ToList()),
-            // new(nameof(ValueType.Multiple), DirectorChoice, _movieContext.Directors.Select(d => d.Name).ToList()),
-            // new(nameof(ValueType.Multiple), ActorsChoice, _movieContext.Actors.Select(a => a.Name).ToList()),
+            new(nameof(ValueType.Multiple), GenreChoice, _movieContext.Genres.Select(g => g.Name).ToList()),
+            new(nameof(ValueType.Multiple), DirectorChoice, _movieContext.Directors.Select(d => d.Name).ToList()),
+            new(nameof(ValueType.Multiple), ActorsChoice, _movieContext.Actors.Select(a => a.Name).ToList()),
             new(nameof(ValueType.Single), DurationChoice, DurationPredicateRule.GetLabels()),
             new(nameof(ValueType.Single), YearChoice, YearPredicateRule.GetLabels()),
             new(nameof(ValueType.Single), RatingChoice, RatingPredicateRule.GetLabels()),
-            // new(nameof(ValueType.Multiple), AwardsChoice, _movieContext.Awards.Select(a => a.Name).ToList()),
+            new(nameof(ValueType.Multiple), AwardsChoice, _movieContext.Awards.Select(a => a.Name).ToList()),
             new(nameof(ValueType.Single), CountryChoice, _movieContext.Countries.Select(c => c.Name).ToList()),
         };
     }
@@ -75,20 +75,17 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
             .Include(nameof(Movie.Country))
             .Include(nameof(Movie.Directors))
             .Include(nameof(Movie.Genres))
-            .Select(m => Rules.MovieDefinition(m.ID.ToString(), m.Title,
-                AddYearRange(yearRange, m.Year).ToString(), AddRatingRange(ratingRange, m.Rating),
-                AddDurationRange(durationRange, m.Duration).ToString(), m.Country.Name))
-            .Cast<RuleDefinition>()
-            .ToList();
-
-
-        var genreDefinition = _movieContext.Genres
-            .Select(g => Rules.GenreDefinition(g.Name))
-            .Cast<RuleDefinition>()
-            .ToList();
-
-        var countryDefinition = _movieContext.Countries
-            .Select(c => Rules.CountryDefinition(c.Name))
+            .Select(m => Rules.MovieDefinition(
+                m.ID.ToString(),
+                m.Title,
+                AddYearRange(yearRange, m.Year).ToString(),
+                AddRatingRange(ratingRange, m.Rating),
+                AddDurationRange(durationRange, m.Duration).ToString(),
+                m.Country.Name,
+                m.Actors.Select(a => a.Name).ToHashSet(),
+                m.Directors.Select(d => d.Name).ToHashSet(),
+                m.Awards.Select(a => a.Name).ToHashSet(),
+                m.Genres.Select(g => g.Name).ToHashSet()))
             .Cast<RuleDefinition>()
             .ToList();
 
@@ -96,12 +93,6 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
         {
             {
                 Rules.MovieRule, moviesDefinitions
-            },
-            {
-                Rules.GenreRule, genreDefinition
-            },
-            {
-                Rules.CountryRule, countryDefinition
             },
             {
                 DurationPredicateRule.Name, durationRange

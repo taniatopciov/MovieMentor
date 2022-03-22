@@ -31,24 +31,39 @@ public static class InferenceController
 
     private static RuleDefinition.Instance Convert(RecommendationDto recommendationDto)
     {
-        var year = recommendationDto.GetSingleValue(KnowledgeBaseLoader.YearChoice);
-        Parameter yearParameter = year == null ? new Parameter.DontCare() : new Parameter.SingleValue(year);
+        var yearParameter = ExtractSingleValueParameter(recommendationDto, KnowledgeBaseLoader.YearChoice);
+        var ratingParameter = ExtractSingleValueParameter(recommendationDto, KnowledgeBaseLoader.RatingChoice);
+        var durationTypeParameter = ExtractSingleValueParameter(recommendationDto, KnowledgeBaseLoader.DurationChoice);
+        var countryParameter = ExtractSingleValueParameter(recommendationDto, KnowledgeBaseLoader.CountryChoice);
 
-        var rating = recommendationDto.GetSingleValue(KnowledgeBaseLoader.RatingChoice);
-        Parameter ratingParameter = rating == null ? new Parameter.DontCare() : new Parameter.SingleValue(rating);
-
-        var durationType = recommendationDto.GetSingleValue(KnowledgeBaseLoader.DurationChoice);
-        Parameter durationTypeParameter =
-            durationType == null ? new Parameter.DontCare() : new Parameter.SingleValue(durationType);
-
-        var country = recommendationDto.GetSingleValue(KnowledgeBaseLoader.CountryChoice);
-        Parameter countryParameter = country == null ? new Parameter.DontCare() : new Parameter.SingleValue(country);
+        var actorsParameter = ExtractMultipleValuesParameter(recommendationDto, KnowledgeBaseLoader.ActorsChoice);
+        var directorsParameter = ExtractMultipleValuesParameter(recommendationDto, KnowledgeBaseLoader.DirectorChoice);
+        var awardsParameter = ExtractMultipleValuesParameter(recommendationDto, KnowledgeBaseLoader.AwardsChoice);
+        var genresParameter = ExtractMultipleValuesParameter(recommendationDto, KnowledgeBaseLoader.GenreChoice);
 
         return Rules.SearchMovieInstance(
             new Parameter.Reference(0),
             yearParameter,
             ratingParameter,
             durationTypeParameter,
-            countryParameter);
+            countryParameter,
+            actorsParameter,
+            directorsParameter,
+            awardsParameter,
+            genresParameter);
+    }
+
+    private static Parameter ExtractSingleValueParameter(RecommendationDto recommendationDto, string fieldName)
+    {
+        var value = recommendationDto.GetSingleValue(fieldName);
+
+        return value == null ? new Parameter.DontCare() : new Parameter.SingleValue(value);
+    }
+
+    private static Parameter ExtractMultipleValuesParameter(RecommendationDto recommendationDto, string fieldName)
+    {
+        var values = recommendationDto.GetValues(fieldName);
+
+        return values == null ? new Parameter.DontCare() : new Parameter.MultipleValues(values.ToHashSet());
     }
 }

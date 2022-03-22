@@ -132,13 +132,7 @@ public class RuleValidator
                                     break;
                                 }
 
-                                if (values.Count != concreteValues.Count)
-                                {
-                                    allMatch = false;
-                                    break;
-                                }
-
-                                if (concreteValues.Any(value => !values.Contains(value)))
+                                if (values.Any() && concreteValues.Any() && !values.Intersect(concreteValues).Any())
                                 {
                                     allMatch = false;
                                     // add break if conditions are added
@@ -160,6 +154,11 @@ public class RuleValidator
                                 }
 
                                 break;
+                        }
+
+                        if (!allMatch)
+                        {
+                            break;
                         }
                     }
 

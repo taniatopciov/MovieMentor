@@ -92,7 +92,8 @@ public class RuleGenerator
                         {
                             // based on the input rule, validate the rule parameters with the provided concrete parameters
 
-                            return GenerateConcreteInstances(instanceDefinitions[step])
+                            var generateConcreteInstances = GenerateConcreteInstances(instanceDefinitions[step]);
+                            return generateConcreteInstances
                                 .Where(generatedDefinition =>
                                 {
                                     foreach (var (generatedParameterName, generatedParameter) in generatedDefinition
@@ -124,7 +125,8 @@ public class RuleGenerator
                                                     return false;
                                                 }
 
-                                                if (values != generatedValues)
+                                                if (values.Any() && generatedValues.Any() &&
+                                                    !values.Intersect(generatedValues).Any())
                                                 {
                                                     return false;
                                                 }
@@ -139,7 +141,8 @@ public class RuleGenerator
 
                                                 if (instanceParameterName != default) // it can happen
                                                 {
-                                                    var providedParameter = inputRuleInstance.ParametersList[instanceParameterName];
+                                                    var providedParameter =
+                                                        inputRuleInstance.ParametersList[instanceParameterName];
                                                     switch (providedParameter)
                                                     {
                                                         case Parameter.SingleValue(var providedValue):
@@ -157,8 +160,7 @@ public class RuleGenerator
 
                                                             break;
                                                         }
-                                                        case Parameter.MultipleValues(var
-                                                            providedValues):
+                                                        case Parameter.MultipleValues(var providedValues):
                                                         {
                                                             if (generatedParameter is not Parameter.MultipleValues(var
                                                                 generatedValues))
@@ -166,7 +168,8 @@ public class RuleGenerator
                                                                 return false;
                                                             }
 
-                                                            if (providedValues != generatedValues)
+                                                            if (providedValues.Any() && generatedValues.Any() &&
+                                                                !providedValues.Intersect(generatedValues).Any())
                                                             {
                                                                 return false;
                                                             }
@@ -297,7 +300,7 @@ public class RuleGenerator
 
                     if (concreteParameter is Parameter.MultipleValues(var values) &&
                         concretePreviousParameter is Parameter.MultipleValues(var previousValues) &&
-                        values == previousValues)
+                        values.Any(v => previousValues.Contains(v)))
                     {
                         continue;
                     }
