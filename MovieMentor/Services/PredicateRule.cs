@@ -1,8 +1,8 @@
-﻿namespace MovieMentor.Rules;
+﻿namespace MovieMentor.Services;
 
-public class PredicateRule
+public class PredicateRule<T>
 {
-    private record PredicateChoice(Predicate<int> Predicate, string Label);
+    private record PredicateChoice(Predicate<T> Predicate, string Label);
 
     private readonly IList<PredicateChoice> _predicateChoices = new List<PredicateChoice>();
     private readonly string _defaultLabel;
@@ -29,7 +29,7 @@ public class PredicateRule
         return labels;
     }
 
-    public string Evaluate(int value)
+    public string Evaluate(T value)
     {
         foreach (var (predicate, label) in _predicateChoices)
         {
@@ -44,14 +44,14 @@ public class PredicateRule
 
     public class Builder
     {
-        private readonly PredicateRule _predicateRule;
+        private readonly PredicateRule<T> _predicateRule;
 
         public Builder(string name, string defaultLabel)
         {
-            _predicateRule = new PredicateRule(name, defaultLabel);
+            _predicateRule = new PredicateRule<T>(name, defaultLabel);
         }
 
-        public Builder AddChoice(string label, Predicate<int> predicate)
+        public Builder AddChoice(string label, Predicate<T> predicate)
         {
             _predicateRule._predicateChoices.Add(new PredicateChoice(predicate, label));
 
@@ -59,11 +59,9 @@ public class PredicateRule
         }
 
 
-        public PredicateRule Build()
+        public PredicateRule<T> Build()
         {
             return _predicateRule;
         }
     }
-
-// "short (< 90 min)", "medium (90 min - 120 min)", "long (> 120 min)"
 }

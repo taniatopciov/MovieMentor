@@ -33,7 +33,7 @@ public class RuleValidator
 
             switch (definition)
             {
-                case RuleDefinition.Composite(var definitionName, var definitionParameters, var definitionInstances)
+                case RuleDefinition.Composite(var (definitionName, definitionParameters), var definitionInstances)
                     when definitionName == name:
                 {
                     var allMatch = true;
@@ -47,14 +47,13 @@ public class RuleValidator
 
                         // replace instanceParameterList reference parameters with the provided parameters
 
-                        foreach (var (parameterName, parameter) in instanceParameterList.Parameters)
+                        foreach (var (parameterName, parameter) in instanceParameterList)
                         {
                             if (parameter is Parameter.Reference(var index))
                             {
                                 // search in definition for reference parameter with index
-                                var definitionReferenceParameterName = definitionParameters.Parameters
-                                    .FirstOrDefault(pair =>
-                                        pair.Value is Parameter.Reference(var refIndex) && refIndex == index).Key;
+                                var definitionReferenceParameterName = definitionParameters.FirstOrDefault(pair =>
+                                    pair.Value is Parameter.Reference(var refIndex) && refIndex == index).Key;
                                 if (definitionReferenceParameterName == default) // it can be null
                                 {
                                     updatedParameterListBuilder =
@@ -113,7 +112,7 @@ public class RuleValidator
                 {
                     var allMatch = true;
 
-                    foreach (var (parameterName, parameter) in parameterList.Parameters)
+                    foreach (var (parameterName, parameter) in parameterList)
                     {
                         var concreteParam = concreteParametersList[parameterName];
                         if (concreteParam == null)
@@ -133,13 +132,7 @@ public class RuleValidator
                                     break;
                                 }
 
-                                if (values.Count != concreteValues.Count)
-                                {
-                                    allMatch = false;
-                                    break;
-                                }
-
-                                if (concreteValues.Any(value => !values.Contains(value)))
+                                if (values.Any() && concreteValues.Any() && !values.Intersect(concreteValues).Any())
                                 {
                                     allMatch = false;
                                     // add break if conditions are added
@@ -161,6 +154,11 @@ public class RuleValidator
                                 }
 
                                 break;
+                        }
+
+                        if (!allMatch)
+                        {
+                            break;
                         }
                     }
 

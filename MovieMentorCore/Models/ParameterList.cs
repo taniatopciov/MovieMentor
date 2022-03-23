@@ -1,10 +1,10 @@
-﻿namespace MovieMentorCore.Models;
+﻿using System.Collections;
 
-public class ParameterList
+namespace MovieMentorCore.Models;
+
+public class ParameterList : IEnumerable<KeyValuePair<string, Parameter>>
 {
-    public static ParameterList Empty() => new();
-
-    public Dictionary<string, Parameter> Parameters { get; } = new();
+    private Dictionary<string, Parameter> Parameters { get; } = new();
 
     public int Count => Parameters.Count;
 
@@ -26,15 +26,14 @@ public class ParameterList
         }
     }
 
-    public ParameterList Copy()
+    IEnumerator IEnumerable.GetEnumerator()
     {
-        var parameterList = new ParameterList();
-        foreach (var (key, value) in Parameters)
-        {
-            parameterList.Parameters.Add(key, value);
-        }
+        return GetEnumerator();
+    }
 
-        return parameterList;
+    public IEnumerator<KeyValuePair<string, Parameter>> GetEnumerator()
+    {
+        return ((IEnumerable<KeyValuePair<string, Parameter>>)Parameters).GetEnumerator();
     }
 
     public class Builder

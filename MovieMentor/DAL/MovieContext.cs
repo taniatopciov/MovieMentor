@@ -20,4 +20,23 @@ public class MovieContext : DbContext
     public MovieContext(DbContextOptions<MovieContext> options) : base(options)
     {
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Movie>()
+            .HasMany(m => m.Genres)
+            .WithMany("Movies");
+
+        modelBuilder.Entity<Movie>()
+            .HasMany(m => m.Actors)
+            .WithMany("Movies");
+
+        modelBuilder.Entity<Movie>()
+            .HasMany(m => m.Directors)
+            .WithMany("Movies");
+
+        modelBuilder.Entity<Movie>()
+            .HasMany(m => m.Awards)
+            .WithMany("Movies");
+    }
 }

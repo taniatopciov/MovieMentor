@@ -27,15 +27,8 @@ public class MoviesService : IMoviesService
 
     public MovieDto? GetMovie(int id)
     {
-        var movie = _movieContext.Movies
-            .Include(movie => movie.Actors).ThenInclude(a => a.Country)
-            .Include(nameof(Movie.Awards))
-            .Include(nameof(Movie.Country))
-            .Include(nameof(Movie.Directors))
-            .Include(nameof(Movie.Genres))
-            .FirstOrDefault(m => m.ID == id);
-
-        return movie == null ? null : ConvertMovie(movie);
+        return GetAllMovies()
+            .FirstOrDefault(m => m.Id == id);
     }
 
     private static MovieDto ConvertMovie(Movie movie)
