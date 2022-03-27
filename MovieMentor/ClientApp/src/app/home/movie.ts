@@ -1,12 +1,9 @@
-import Director from "./director";
-import Actor from "./actor";
-
 export default interface Movie {
   id: number;
   title: string;
   genres: string[];
-  director: Director[];
-  actor: Actor[];
+  directors: string[];
+  actors: string[];
   year: number;
   awards: string[];
   duration: number;

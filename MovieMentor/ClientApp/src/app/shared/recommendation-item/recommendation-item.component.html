@@ -1,0 +1,53 @@
+<mat-expansion-panel *ngIf="movieData">
+  <mat-expansion-panel-header fxLayout="row">
+    <mat-panel-title class="panel-title">
+      {{movieData.title}}
+    </mat-panel-title>
+    <mat-panel-description fxFlex></mat-panel-description>
+    <mat-panel-description>
+      IMDb Rating: {{movieData.rating}}
+    </mat-panel-description>
+  </mat-expansion-panel-header>
+  <div fxLayout="row">
+    <div fxLayout="column" fxLayoutAlign="space-around center">
+      <img class="image" src="../../../assets/images/movieposter.jpg" alt="W3Schools.com">
+      <a mat-stroked-button href="https://en.wikipedia.org" target="_blank">More Details</a>
+    </div>
+    <div fxFlex fxLayout="column" fxLayoutAlign="space-around start">
+      <div class="prop-div" fxLayout="row" fxLayoutAlign="start center">
+        <span class="property">Genre:</span>
+        <mat-chip-list
+          class="example-chip">
+          <mat-chip selected *ngFor="let genre of movieData.genres">
+            {{genre}}
+          </mat-chip>
+        </mat-chip-list>
+      </div>
+      <div class="prop-div" fxLayout="row" fxLayoutAlign="start center">
+        <span *ngIf="movieData.directors.length == 1" class="property">Director:</span>
+        <span *ngIf="movieData.directors.length > 1" class="property">Directors:</span>
+        <span class="property-value">  {{getItemsString(movieData.directors)}} </span>
+      </div>
+      <div class="prop-div" fxLayout="row" fxLayoutAlign="start center">
+        <span *ngIf="movieData.actors.length == 1" class="property">Actor:</span>
+        <span *ngIf="movieData.actors.length > 1" class="property">Actors:</span>
+        <span class="property-value">  {{getItemsString(movieData.actors)}} </span>
+      </div>
+      <div class="prop-div" fxLayout="row" fxLayoutAlign="start center">
+        <span class="property">Release year:</span>
+        <span class="property-value"> {{movieData.year}} </span>
+      </div>
+      <div class="prop-div" fxLayout="row" fxLayoutAlign="start center">
+        <span class="property">Duration:</span>
+        <span class="property-value"> {{movieData.duration}} min</span>
+      </div>
+
+      <!--      <div class="prop-div" fxLayout="row" fxLayoutAlign="start start">-->
+      <!--        <span class="property">Description:</span>-->
+      <!--        <span class="property-value"> {{description}} </span>-->
+      <!--      </div>-->
+      <div class="description"> {{description}} </div>
+
+    </div>
+  </div>
+</mat-expansion-panel>

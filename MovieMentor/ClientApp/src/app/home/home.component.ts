@@ -3,6 +3,7 @@ import {MoviesService} from "../services/movies-service/movies.service";
 import Tag from "../services/movies-service/tag";
 import ResponseChoices from "./responseChoices";
 import {MatStepper} from "@angular/material/stepper";
+import Movie from "./movie";
 
 @Component({
   selector: 'app-home',
@@ -14,6 +15,7 @@ export class HomeComponent implements OnInit {
   tags: Tag[] = [];
   options = new Map<string, string[]>();
   panelOpenState = false;
+  movies: Movie[] = [];
 
   constructor(private moviesService: MoviesService, private changeDetectorRef: ChangeDetectorRef) {
   }
@@ -46,10 +48,11 @@ export class HomeComponent implements OnInit {
   }
 
   onGetRecommendationButtonClick() {
-    this.moviesService.getRecommendation(this.createOptionsObject()).subscribe(data => {
-
+    this.moviesService.getRecommendations(this.createOptionsObject()).subscribe(data => {
+      console.log(data);
+      this.movies = data;
+      console.log(this.movies);
     });
-    console.log(this.createOptionsObject());
   }
 
   goBack(stepper: MatStepper) {

@@ -1,7 +1,7 @@
 .mat-card {
   width: 80%;
-  height: calc(80% - 72px);
-  max-height: calc(80% - 72px);
+  height: calc(90% - 72px);
+  max-height: calc(90% - 72px);
   margin: auto;
   position: absolute;
   top: calc(50% + 72px);
@@ -9,46 +9,63 @@
   transform: translate(-50%, calc(-50% - 36px));
 }
 
+@media (min-width: 1440px) {
+  .mat-card {
+    width: 80%;
+    height: calc(80% - 72px);
+    max-height: calc(80% - 72px);
+    margin: auto;
+    position: absolute;
+    top: calc(50% + 72px);
+    left: 50%;
+    transform: translate(-50%, calc(-50% - 36px));
+  }
+}
+
 .stp {
   width: 100%;
   height: calc(100% - 72px);
-  //max-height: 100%;
   display: flex;
   flex-direction: column;
 }
 
 .back-button {
-  //margin-right: 16px;
-  //margin-top: 16px;
+  margin-left: 16px;
+  margin-bottom: 10px;
 }
 
 .next-button {
-  //margin-top: 16px;
+  margin-left: 16px;
+  margin-bottom: 10px;
 }
 
 .step-buttons {
-  //margin-top:16px;
+  height: 100%;
   flex-direction: row;
+  box-sizing: border-box;
+  display: flex;
+  place-content: center flex-start;
+  align-items: end;
+}
+
+
+.rec-div {
+  overflow: auto;
+  height: 100%;
+  flex-direction: column;
   box-sizing: border-box;
   display: flex;
   place-content: center flex-start;
   align-items: center;
 }
 
-
-//.rec-div {
-//  overflow: auto;
-//  height: 230px;
-//}
-
-:host ::ng-deep .mat-horizontal-content-container {
-  overflow-y: auto;
-  margin-right: 32px;
+.acc {
+  width:100%;
   height: 100%;
 }
 
-:host ::ng-deep .mat-horizontal-stepper-content {
-  //height: 100%;
-  //max-height: 100%;
-  //background-color: black;
+:host ::ng-deep .mat-horizontal-content-container {
+  overflow-y: auto;
+  //margin-right: 32px;
+  height: 100%;
 }

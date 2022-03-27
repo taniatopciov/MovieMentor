@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import Tag from "./tag";
 import ResponseChoices from "../../home/responseChoices";
+import Movie from "../../home/movie";
 
 @Injectable({
   providedIn: 'root'
@@ -18,14 +19,8 @@ export class MoviesService {
     return this.http.get<Tag[]>(this.movieTagsUrl);
   }
 
-  getRecommendation(selectedOptions: ResponseChoices[]) {
-    // var obj = {
-    //   choices: selectedOptions
-    // }
-    //
-    // console.log(obj);
-
-    return this.http.post(this.inferenceUrl, {
+  getRecommendations(selectedOptions: ResponseChoices[]) {
+    return this.http.post<Movie[]>(this.inferenceUrl, {
       choices: selectedOptions
     });
   }
