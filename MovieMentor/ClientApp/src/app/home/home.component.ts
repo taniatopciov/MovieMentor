@@ -62,4 +62,12 @@ export class HomeComponent implements OnInit {
   goForward(stepper: MatStepper) {
     stepper.next();
   }
+
+  isDisabled(tag: Tag) {
+    if (tag.optional) {
+      return false;
+    }
+
+    return !this.options.has(tag.name) || this.options.get(tag.name)?.length == 0;
+  }
 }

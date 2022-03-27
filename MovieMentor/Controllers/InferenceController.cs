@@ -38,7 +38,6 @@ public static class InferenceController
 
         var actorsParameter = ExtractMultipleValuesParameter(recommendationDto, KnowledgeBaseLoader.ActorsChoice);
         var directorsParameter = ExtractMultipleValuesParameter(recommendationDto, KnowledgeBaseLoader.DirectorChoice);
-        var awardsParameter = ExtractMultipleValuesParameter(recommendationDto, KnowledgeBaseLoader.AwardsChoice);
         var genresParameter = ExtractMultipleValuesParameter(recommendationDto, KnowledgeBaseLoader.GenreChoice);
 
         return Rules.SearchMovieInstance(
@@ -49,7 +48,6 @@ public static class InferenceController
             countryParameter,
             actorsParameter,
             directorsParameter,
-            awardsParameter,
             genresParameter);
     }
 

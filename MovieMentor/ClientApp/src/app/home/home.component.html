@@ -1,17 +1,17 @@
 <mat-card fxLayout="column" fxLayoutAlign="space-between start">
   <mat-stepper class="stp" labelPosition="bottom" linear #stepper>
-<!--    <mat-step *ngFor="let tag of tags; let i = index;">-->
-<!--      <ng-template matStepLabel>{{tag.name}}</ng-template>-->
-<!--      <multiple-selection-list *ngIf="tag.type === 'Multiple'" [listData]="tag.values"-->
-<!--                               (updateSelectedListItem)="onUpdateSelectedMultipleItems(tag.name, $event)"></multiple-selection-list>-->
-<!--      <single-selection-list *ngIf="tag.type === 'Single'" [listData]="tag.values"-->
-<!--                             (updateSelectedListItem)="onUpdateSelectedSingleItem(tag.name, $event)"></single-selection-list>-->
-<!--    </mat-step>-->
+    <mat-step *ngFor="let tag of tags; let i = index;" [optional]="tag.optional">
+      <ng-template matStepLabel>{{tag.name}}</ng-template>
+      <multiple-selection-list *ngIf="tag.type === 'Multiple'" [listData]="tag.values"
+                               (updateSelectedListItem)="onUpdateSelectedMultipleItems(tag.name, $event)"></multiple-selection-list>
+      <single-selection-list *ngIf="tag.type === 'Single'" [listData]="tag.values"
+                             (updateSelectedListItem)="onUpdateSelectedSingleItem(tag.name, $event)"></single-selection-list>
+    </mat-step>
 
     <mat-step>
       <ng-template matStepLabel>Recommendation</ng-template>
       <div class="rec-div">
-<!--        <mat-spinner color="accent" strokeWidth="4" [diameter]="150"></mat-spinner>-->
+        <!--        <mat-spinner color="accent" strokeWidth="4" [diameter]="150"></mat-spinner>-->
         <mat-accordion *ngFor="let movie of movies" class="acc">
           <recommendation-item [movieData]="movie"></recommendation-item>
         </mat-accordion>
@@ -23,12 +23,12 @@
             (click)="goBack(stepper)">Back
     </button>
     <button *ngIf="stepper.selectedIndex === tags.length - 1"
-            [disabled]="!options.has(tags[stepper.selectedIndex].name) || options.get(tags[stepper.selectedIndex].name)?.length == 0"
+            [disabled]="isDisabled(tags[stepper.selectedIndex])"
             class="next-button" mat-raised-button color="primary"
             (click)="goForward(stepper); onGetRecommendationButtonClick()">Get Recommendation
     </button>
     <button *ngIf="stepper.selectedIndex < tags.length - 1"
-            [disabled]="!options.has(tags[stepper.selectedIndex].name) || options.get(tags[stepper.selectedIndex].name)?.length == 0"
+            [disabled]="isDisabled(tags[stepper.selectedIndex])"
             class="next-button" mat-raised-button color="primary" (click)="goForward(stepper)">Next
     </button>
   </div>

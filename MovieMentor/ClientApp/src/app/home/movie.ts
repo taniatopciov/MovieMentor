@@ -5,7 +5,6 @@ export default interface Movie {
   directors: string[];
   actors: string[];
   year: number;
-  awards: string[];
   duration: number;
   country: string;
   rating: string;

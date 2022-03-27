@@ -14,9 +14,7 @@ public class MovieContext : DbContext
     public DbSet<Country> Countries { get; set; }
 
     public DbSet<Director> Directors { get; set; }
-
-    public DbSet<Award> Awards { get; set; }
-
+    
     public DbSet<Actor> Actors { get; set; }
 
     public DbSet<Genre> Genres { get; set; }
@@ -39,10 +37,6 @@ public class MovieContext : DbContext
 
         modelBuilder.Entity<Movie>()
             .HasMany(m => m.Directors)
-            .WithMany("Movies");
-
-        modelBuilder.Entity<Movie>()
-            .HasMany(m => m.Awards)
             .WithMany("Movies");
     }
 
