@@ -64,8 +64,11 @@
   height: 100%;
 }
 
+.no-movies{
+  margin-top: 64px;
+}
+
 :host ::ng-deep .mat-horizontal-content-container {
   overflow-y: auto;
-  //margin-right: 32px;
   height: 100%;
 }

@@ -11,10 +11,11 @@
     <mat-step>
       <ng-template matStepLabel>Recommendation</ng-template>
       <div class="rec-div">
-        <!--        <mat-spinner color="accent" strokeWidth="4" [diameter]="150"></mat-spinner>-->
-        <mat-accordion *ngFor="let movie of movies" class="acc">
-          <recommendation-item [movieData]="movie"></recommendation-item>
+        <mat-spinner *ngIf="spin" color="accent" strokeWidth="4" [diameter]="150"></mat-spinner>
+        <mat-accordion class="acc">
+          <recommendation-item *ngFor="let movie of movies" [movieData]="movie"></recommendation-item>
         </mat-accordion>
+        <h2 class="no-movies" *ngIf="!spin && movies.length == 0">Could not find movies with chosen properties</h2>
       </div>
     </mat-step>
   </mat-stepper>

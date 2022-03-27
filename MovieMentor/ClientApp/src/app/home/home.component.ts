@@ -16,6 +16,7 @@ export class HomeComponent implements OnInit {
   options = new Map<string, string[]>();
   panelOpenState = false;
   movies: Movie[] = [];
+  spin = true;
 
   constructor(private moviesService: MoviesService, private changeDetectorRef: ChangeDetectorRef) {
   }
@@ -49,9 +50,8 @@ export class HomeComponent implements OnInit {
 
   onGetRecommendationButtonClick() {
     this.moviesService.getRecommendations(this.createOptionsObject()).subscribe(data => {
-      console.log(data);
       this.movies = data;
-      console.log(this.movies);
+      this.spin = false;
     });
   }
 

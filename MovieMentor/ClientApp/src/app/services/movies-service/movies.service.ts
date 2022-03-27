@@ -3,6 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import Tag from "./tag";
 import ResponseChoices from "../../home/responseChoices";
 import Movie from "../../home/movie";
+import {map} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -20,8 +21,20 @@ export class MoviesService {
   }
 
   getRecommendations(selectedOptions: ResponseChoices[]) {
-    return this.http.post<Movie[]>(this.inferenceUrl, {
+    return this.http.post<any[]>(this.inferenceUrl, {
       choices: selectedOptions
-    });
+    }).pipe(map(data => {
+      const movies: Movie[] = [];
+
+      data.forEach(movie => {
+        movies.push({
+          ...movie,
+          actors: movie.actors.map((actor: any) => actor.name),
+          directors: movie.directors.map((director: any) => director.name)
+        });
+      });
+
+      return movies;
+    }));
   }
 }
