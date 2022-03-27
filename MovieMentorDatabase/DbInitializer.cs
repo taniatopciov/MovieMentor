@@ -73,21 +73,7 @@ public static class DbInitializer
         {
             context.Directors.Add(director);
         }
-
-        await context.SaveChangesAsync();
-
-        var bestCinematography = new Award { Name = "Best Cinematography" };
-        var bestAnimatedFilm = new Award { Name = "Best Animated Film" };
-        var awards = new List<Award>
-        {
-            bestCinematography,
-            bestAnimatedFilm,
-        };
-        foreach (var award in awards)
-        {
-            context.Awards.Add(award);
-        }
-
+        
         await context.SaveChangesAsync();
 
         var bale = new Actor { Name = "Christian Bale", Country = uk };
@@ -119,7 +105,6 @@ public static class DbInitializer
             {
                 Title = "Batman Begins",
                 Actors = new List<Actor> { bale, freeman },
-                Awards = new List<Award> { bestCinematography },
                 Country = usa,
                 Directors = new List<Director> { nolan },
                 Duration = 140,
@@ -131,7 +116,6 @@ public static class DbInitializer
             {
                 Title = "Encanto",
                 Actors = new List<Actor> { beatriz, maluma },
-                Awards = new List<Award> { bestAnimatedFilm },
                 Country = usa,
                 Directors = new List<Director> { howard, bush },
                 Duration = 109,
@@ -143,7 +127,6 @@ public static class DbInitializer
             {
                 Title = "Bani negri",
                 Actors = new List<Actor> { bota, papadopol },
-                Awards = new List<Award>(),
                 Country = romania,
                 Directors = new List<Director>(),
                 Duration = 400,

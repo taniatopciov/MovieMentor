@@ -18,7 +18,6 @@ public class MoviesService : IMoviesService
     {
         return _movieContext.Movies
             .Include(movie => movie.Actors).ThenInclude(a => a.Country)
-            .Include(nameof(Movie.Awards))
             .Include(nameof(Movie.Country))
             .Include(nameof(Movie.Directors))
             .Include(nameof(Movie.Genres))
@@ -36,6 +35,6 @@ public class MoviesService : IMoviesService
         return new MovieDto(movie.ID, movie.Title, movie.Genres.Select(g => g.Name).ToList(),
             movie.Directors.Select(d => new DirectorDto(d.Name)).ToList(),
             movie.Actors.Select(a => new ActorDto(a.Name, a.Country.Name)).ToList(), movie.Year,
-            movie.Awards.Select(a => a.Name).ToList(), movie.Duration, movie.Country.Name, movie.Rating);
+            movie.Duration, movie.Country.Name, movie.Rating);
     }
 }

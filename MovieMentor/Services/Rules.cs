@@ -16,7 +16,6 @@ public static class Rules
         public const string Title = "Title";
         public const string Country = "Country";
         public const string Directors = "Directors";
-        public const string Awards = "Awards";
         public const string Genres = "Genres";
         public const string Actors = "Actors";
         public const string Year = "Year";
@@ -57,7 +56,7 @@ public static class Rules
     #region Movie
 
     public static RuleDefinition.Instance MovieDefinition(string id, string title, string year, string rating,
-        string duration, string country, ISet<string> actors, ISet<string> directors, ISet<string> awards,
+        string duration, string country, ISet<string> actors, ISet<string> directors,
         ISet<string> genres) =>
         MovieRuleInstance(new Parameter.SingleValue(id),
             new Parameter.SingleValue(title),
@@ -67,12 +66,11 @@ public static class Rules
             new Parameter.SingleValue(country),
             new Parameter.MultipleValues(actors),
             new Parameter.MultipleValues(directors),
-            new Parameter.MultipleValues(awards),
             new Parameter.MultipleValues(genres));
 
     public static RuleDefinition.Instance MovieRuleInstance(Parameter id, Parameter title, Parameter year,
         Parameter rating, Parameter duration, Parameter country, Parameter actors, Parameter directors,
-        Parameter awards, Parameter genres) => new(MovieRule, new ParameterList.Builder()
+        Parameter genres) => new(MovieRule, new ParameterList.Builder()
         .AddParameter(Parameters.ID, id)
         .AddParameter(Parameters.Title, title)
         .AddParameter(Parameters.Year, year)
@@ -81,7 +79,6 @@ public static class Rules
         .AddParameter(Parameters.Country, country)
         .AddParameter(Parameters.Actors, actors)
         .AddParameter(Parameters.Directors, directors)
-        .AddParameter(Parameters.Awards, awards)
         .AddParameter(Parameters.Genres, genres)
         .Build());
 
@@ -114,8 +111,7 @@ public static class Rules
         const int countryIndex = 7;
         const int actorsIndex = 8;
         const int directorsIndex = 9;
-        const int awardsIndex = 10;
-        const int genresIndex = 11;
+        const int genresIndex = 10;
 
         return new RuleDefinition.Composite(SearchMovieInstance(
             new Parameter.Reference(idIndex),
@@ -125,7 +121,6 @@ public static class Rules
             new Parameter.Reference(countryIndex),
             new Parameter.Reference(actorsIndex),
             new Parameter.Reference(directorsIndex),
-            new Parameter.Reference(awardsIndex),
             new Parameter.Reference(genresIndex)
         ), new List<RuleDefinition.Instance>
         {
@@ -138,7 +133,6 @@ public static class Rules
                 new Parameter.Reference(countryIndex),
                 new Parameter.Reference(actorsIndex),
                 new Parameter.Reference(directorsIndex),
-                new Parameter.Reference(awardsIndex),
                 new Parameter.Reference(genresIndex)
             ),
             DurationRangeInstance(
@@ -155,7 +149,7 @@ public static class Rules
     }
 
     public static RuleDefinition.Instance SearchMovieInstance(Parameter id, Parameter yearRange, Parameter ratingRange,
-        Parameter durationRange, Parameter country, Parameter actors, Parameter directors, Parameter awards,
+        Parameter durationRange, Parameter country, Parameter actors, Parameter directors,
         Parameter genres) => new(SearchMovieRule, new ParameterList.Builder()
         .AddParameter(Parameters.ID, id)
         .AddParameter(YearRangeRule, yearRange)
@@ -164,7 +158,6 @@ public static class Rules
         .AddParameter(Parameters.Country, country)
         .AddParameter(Parameters.Actors, actors)
         .AddParameter(Parameters.Directors, directors)
-        .AddParameter(Parameters.Awards, awards)
         .AddParameter(Parameters.Genres, genres)
         .Build());
 

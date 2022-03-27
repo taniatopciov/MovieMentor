@@ -15,7 +15,6 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
     public const string DurationChoice = "Duration";
     public const string YearChoice = "Year";
     public const string RatingChoice = "Rating";
-    public const string AwardsChoice = "Awards";
     public const string CountryChoice = "Country";
 
     private static readonly PredicateRule<int> DurationPredicateRule =
@@ -52,14 +51,13 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
     {
         return new List<ChoiceDto>
         {
-            new(nameof(ValueType.Multiple), GenreChoice, _movieContext.Genres.Select(g => g.Name).ToList()),
-            new(nameof(ValueType.Multiple), DirectorChoice, _movieContext.Directors.Select(d => d.Name).ToList()),
-            new(nameof(ValueType.Multiple), ActorsChoice, _movieContext.Actors.Select(a => a.Name).ToList()),
-            new(nameof(ValueType.Single), DurationChoice, DurationPredicateRule.GetLabels()),
-            new(nameof(ValueType.Single), YearChoice, YearPredicateRule.GetLabels()),
-            new(nameof(ValueType.Single), RatingChoice, RatingPredicateRule.GetLabels()),
-            new(nameof(ValueType.Multiple), AwardsChoice, _movieContext.Awards.Select(a => a.Name).ToList()),
-            new(nameof(ValueType.Single), CountryChoice, _movieContext.Countries.Select(c => c.Name).ToList()),
+            new(nameof(ValueType.Multiple), GenreChoice, false, _movieContext.Genres.Select(g => g.Name).ToList()),
+            new(nameof(ValueType.Multiple), DirectorChoice, true, _movieContext.Directors.Select(d => d.Name).ToList()),
+            new(nameof(ValueType.Multiple), ActorsChoice, true, _movieContext.Actors.Select(a => a.Name).ToList()),
+            new(nameof(ValueType.Single), DurationChoice, true, DurationPredicateRule.GetLabels()),
+            new(nameof(ValueType.Single), YearChoice, false, YearPredicateRule.GetLabels()),
+            new(nameof(ValueType.Single), RatingChoice, true, RatingPredicateRule.GetLabels()),
+            new(nameof(ValueType.Single), CountryChoice, true, _movieContext.Countries.Select(c => c.Name).ToList()),
         };
     }
 
@@ -71,7 +69,6 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
 
         var moviesDefinitions = _movieContext.Movies
             .Include(movie => movie.Actors).ThenInclude(a => a.Country)
-            .Include(nameof(Movie.Awards))
             .Include(nameof(Movie.Country))
             .Include(nameof(Movie.Directors))
             .Include(nameof(Movie.Genres))
@@ -84,7 +81,6 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
                 m.Country.Name,
                 m.Actors.Select(a => a.Name).ToHashSet(),
                 m.Directors.Select(d => d.Name).ToHashSet(),
-                m.Awards.Select(a => a.Name).ToHashSet(),
                 m.Genres.Select(g => g.Name).ToHashSet()))
             .Cast<RuleDefinition>()
             .ToList();

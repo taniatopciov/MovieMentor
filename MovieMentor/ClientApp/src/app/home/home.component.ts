@@ -2,6 +2,8 @@ import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {MoviesService} from "../services/movies-service/movies.service";
 import Tag from "../services/movies-service/tag";
 import ResponseChoices from "./responseChoices";
+import {MatStepper} from "@angular/material/stepper";
+import Movie from "./movie";
 
 @Component({
   selector: 'app-home',
@@ -12,6 +14,9 @@ export class HomeComponent implements OnInit {
 
   tags: Tag[] = [];
   options = new Map<string, string[]>();
+  panelOpenState = false;
+  movies: Movie[] = [];
+  spin = true;
 
   constructor(private moviesService: MoviesService, private changeDetectorRef: ChangeDetectorRef) {
   }
@@ -44,9 +49,25 @@ export class HomeComponent implements OnInit {
   }
 
   onGetRecommendationButtonClick() {
-    this.moviesService.getRecommendation(this.createOptionsObject()).subscribe(data => {
-
+    this.moviesService.getRecommendations(this.createOptionsObject()).subscribe(data => {
+      this.movies = data;
+      this.spin = false;
     });
-    console.log(this.createOptionsObject());
+  }
+
+  goBack(stepper: MatStepper) {
+    stepper.previous();
+  }
+
+  goForward(stepper: MatStepper) {
+    stepper.next();
+  }
+
+  isDisabled(tag: Tag) {
+    if (tag.optional) {
+      return false;
+    }
+
+    return !this.options.has(tag.name) || this.options.get(tag.name)?.length == 0;
   }
 }

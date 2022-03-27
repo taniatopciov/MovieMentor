@@ -21,9 +21,12 @@ import {MatCardModule} from '@angular/material/card';
 import {MatListModule} from '@angular/material/list';
 import {MatRadioModule} from '@angular/material/radio';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatExpansionModule} from '@angular/material/expansion';
+import {MatChipsModule} from '@angular/material/chips';
 
 import { MultipleSelectionListComponent } from './shared/multiple-selection-list/multiple-selection-list.component';
 import { SingleSelectionListComponent } from './shared/single-selection-list/single-selection-list.component';
+import { RecommendationItemComponent } from './shared/recommendation-item/recommendation-item.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +34,8 @@ import { SingleSelectionListComponent } from './shared/single-selection-list/sin
     NavMenuComponent,
     HomeComponent,
     MultipleSelectionListComponent,
-    SingleSelectionListComponent
+    SingleSelectionListComponent,
+    RecommendationItemComponent
   ],
   imports: [
     BrowserModule.withServerTransition({appId: 'ng-cli-universal'}),
@@ -53,7 +57,9 @@ import { SingleSelectionListComponent } from './shared/single-selection-list/sin
     MatCardModule,
     MatListModule,
     MatRadioModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatExpansionModule,
+    MatChipsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

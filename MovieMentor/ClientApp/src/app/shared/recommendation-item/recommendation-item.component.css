@@ -1,0 +1,43 @@
+.image {
+  max-height: 224px;
+  width: auto;
+  margin-bottom: 24px;
+}
+
+.prop-div {
+  margin-bottom: 8px;
+}
+
+.panel-title {
+  font-weight: 550;
+}
+
+.property {
+  font-weight: 550;
+  margin-left: 24px;
+  margin-right: 8px;
+}
+
+.property-value {
+  opacity: 0.7;
+}
+
+.description {
+  margin-left: 24px;
+}
+
+.example-box.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.example-chip .cdk-drop-list-dragging {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+a {
+  color: var(--accent-color) !important;
+}
+
+a:visited {
+  color: #AB47BC;
+}

@@ -14,8 +14,6 @@ public class Movie
 
     public int Year { get; set; }
 
-    public virtual List<Award> Awards { get; set; }
-
     public int Duration { get; set; }
 
     public Country Country { get; set; }
