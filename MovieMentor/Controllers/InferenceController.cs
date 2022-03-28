@@ -26,7 +26,8 @@ public static class InferenceController
 
                 return null;
             })
-            .OfType<MovieDto>();
+            .OfType<MovieDto>()
+            .Take(5);
     }
 
     private static RuleDefinition.Instance Convert(RecommendationDto recommendationDto)

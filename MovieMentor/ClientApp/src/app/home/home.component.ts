@@ -49,6 +49,9 @@ export class HomeComponent implements OnInit {
   }
 
   onGetRecommendationButtonClick() {
+    this.spin = true;
+    this.movies = [];
+    
     this.moviesService.getRecommendations(this.createOptionsObject()).subscribe(data => {
       this.movies = data;
       this.spin = false;
