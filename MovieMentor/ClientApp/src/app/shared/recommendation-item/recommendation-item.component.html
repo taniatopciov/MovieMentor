@@ -1,10 +1,9 @@
 <mat-expansion-panel *ngIf="movieData">
   <mat-expansion-panel-header fxLayout="row">
-    <mat-panel-title class="panel-title">
+    <mat-panel-title class="panel-title" fxFlex="50">
       {{movieData.title}}
     </mat-panel-title>
-    <mat-panel-description fxFlex></mat-panel-description>
-    <mat-panel-description>
+    <mat-panel-description fxFlex>
       IMDb Rating: {{movieData.rating}}
     </mat-panel-description>
   </mat-expansion-panel-header>
