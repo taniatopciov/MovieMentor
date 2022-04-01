@@ -68,7 +68,7 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
         var ratingRange = new List<RuleDefinition>();
 
         var moviesDefinitions = _movieContext.Movies
-            .Include(movie => movie.Actors).ThenInclude(a => a.Country)
+            .Include(movie => movie.Actors)
             .Include(nameof(Movie.Country))
             .Include(nameof(Movie.Directors))
             .Include(nameof(Movie.Genres))

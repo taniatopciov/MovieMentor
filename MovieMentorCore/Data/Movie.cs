@@ -16,7 +16,9 @@ public class Movie
 
     public int Duration { get; set; }
 
-    public Country Country { get; set; }
+    public virtual Country Country { get; set; }
 
     public string Rating { get; set; }
+    
+    public string Link { get; set; }
 }

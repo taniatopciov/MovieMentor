@@ -1,5 +1,7 @@
-﻿using MovieMentorCore.Data;
+﻿using System.Globalization;
+using MovieMentorCore.Data;
 using MovieMentorDatabase.DAL;
+using CsvHelper;
 
 namespace MovieMentorDatabase;
 
@@ -7,7 +9,7 @@ public static class DbInitializer
 {
     public static async Task Initialize(MovieContext context)
     {
-        // await context.Database.EnsureDeletedAsync();
+        await context.Database.EnsureDeletedAsync();
         await context.Database.EnsureCreatedAsync();
 
         if (context.Movies.Any())
@@ -15,132 +17,63 @@ public static class DbInitializer
             return;
         }
 
-        var romania = new Country { Name = "Romania" };
-        var usa = new Country { Name = "USA" };
-        var uk = new Country { Name = "United Kingdom" };
-        var argentina = new Country { Name = "Argentina" };
-        var columbia = new Country { Name = "Columbia" };
-        var countries = new List<Country>
-        {
-            romania,
-            usa,
-            uk,
-            argentina,
-            columbia,
-        };
-        foreach (var country in countries)
-        {
-            context.Countries.Add(country);
-        }
+        Dictionary<string, Genre> genreDict = new();
+        Dictionary<string, Actor> actorDict = new();
+        Dictionary<string, Director> directorDict = new();
+        Dictionary<string, Country> countryDict = new();
 
-        await context.SaveChangesAsync();
-
-
-        var action = new Genre { Name = "Action" };
-        var adventure = new Genre { Name = "Adventure" };
-        var thriller = new Genre { Name = "Thriller" };
-        var comedy = new Genre { Name = "Comedy" };
-        var animated = new Genre { Name = "Animated" };
-        var genres = new List<Genre>
+        using (var streamReader = new StreamReader(@"MoviesData\SEMovies.csv"))
         {
-            action,
-            adventure,
-            thriller,
-            comedy,
-            animated
-        };
-        foreach (var genre in genres)
-        {
-            context.Genres.Add(genre);
-        }
-
-        await context.SaveChangesAsync();
-
-        var nolan = new Director { Name = "Christopher Nolan" };
-        var watts = new Director { Name = "Jon Watts" };
-        var bush = new Director { Name = "Jared Bush" };
-        var howard = new Director { Name = "Byron Howard" };
-        var smith = new Director { Name = "Charise Castro Smith" };
-        var directors = new List<Director>
-        {
-            nolan,
-            watts,
-            bush,
-            howard,
-            smith,
-        };
-        foreach (var director in directors)
-        {
-            context.Directors.Add(director);
-        }
-        
-        await context.SaveChangesAsync();
-
-        var bale = new Actor { Name = "Christian Bale", Country = uk };
-        var freeman = new Actor { Name = "Morgan Freeman", Country = usa };
-        var maluma = new Actor { Name = "Maluma", Country = columbia };
-        var beatriz = new Actor { Name = "Stephanie Beatriz", Country = argentina };
-        var bota = new Actor { Name = "Cristian Bota", Country = romania };
-        var papadopol = new Actor { Name = "Alexandru Papadopol", Country = romania };
-        var actors = new List<Actor>
-        {
-            bale,
-            freeman,
-            maluma,
-            beatriz,
-            bota,
-            papadopol
-        };
-        foreach (var actor in actors)
-        {
-            context.Actors.Add(actor);
-        }
-
-        await context.SaveChangesAsync();
-
-
-        var movies = new List<Movie>
-        {
-            new()
+            using (var csvReader = new CsvReader(streamReader, CultureInfo.InvariantCulture))
             {
-                Title = "Batman Begins",
-                Actors = new List<Actor> { bale, freeman },
-                Country = usa,
-                Directors = new List<Director> { nolan },
-                Duration = 140,
-                Rating = "8.3",
-                Year = 2005,
-                Genres = new List<Genre> { action, thriller },
-            },
-            new()
-            {
-                Title = "Encanto",
-                Actors = new List<Actor> { beatriz, maluma },
-                Country = usa,
-                Directors = new List<Director> { howard, bush },
-                Duration = 109,
-                Rating = "7.3",
-                Year = 2021,
-                Genres = new List<Genre> { comedy, animated },
-            },
-            new()
-            {
-                Title = "Bani negri",
-                Actors = new List<Actor> { bota, papadopol },
-                Country = romania,
-                Directors = new List<Director>(),
-                Duration = 400,
-                Rating = "8.1",
-                Year = 2020,
-                Genres = new List<Genre> { action, comedy },
-            },
-        };
+                csvReader.Context.RegisterClassMap<MovieMap>();
+                var records = csvReader.GetRecords<MovieCsv>().ToList();
 
-        foreach (var movie in movies)
-        {
-            context.Movies.Add(movie);
+                foreach (var record in records)
+                {
+                    if (!genreDict.TryGetValue(record.Genre, out var genre))
+                    {
+                        genre = new Genre {Name = record.Genre};
+                        genreDict.Add(record.Genre, genre);
+                    }
+
+                    if (!actorDict.TryGetValue(record.Actor, out var actor))
+                    {
+                        actor = new Actor {Name = record.Actor};
+                        actorDict.Add(record.Actor, actor);
+                    }
+
+                    if (!directorDict.TryGetValue(record.Director, out var director))
+                    {
+                        director = new Director {Name = record.Director};
+                        directorDict.Add(record.Director, director);
+                    }
+
+                    if (!countryDict.TryGetValue(record.Country, out var country))
+                    {
+                        country = new Country {Name = record.Country};
+                        countryDict.Add(record.Country, country);
+                    }
+
+                    var movie = new Movie
+                    {
+                        Title = record.Name,
+                        Actors = new List<Actor> {actor},
+                        Country = country,
+                        Directors = new List<Director> {director},
+                        Duration = record.Duration,
+                        Year = record.Year,
+                        Genres = new List<Genre> {genre},
+                        Rating = record.Score.ToString(),
+                        Link = record.Link
+                    };
+
+                    context.Movies.Add(movie);
+                }
+
+                await context.SaveChangesAsync();
+            }
         }
 
-        await context.SaveChangesAsync();
     }
 }

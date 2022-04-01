@@ -1,3 +1,3 @@
 ﻿namespace MovieMentor.DTO;
 
-public record ActorDto(string Name, string Country);
+public record ActorDto(string Name);
