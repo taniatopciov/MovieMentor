@@ -9,6 +9,7 @@ public static class Rules
     public const string RatingRangeRule = "RatingRange";
     public const string MovieRule = "Movie";
     public const string SearchMovieRule = "SearchMovie";
+    public const string GenrePredicateRule = "GenrePredicate";
 
     private static class Parameters
     {
@@ -112,6 +113,7 @@ public static class Rules
         const int actorsIndex = 8;
         const int directorsIndex = 9;
         const int genresIndex = 10;
+        const int genresPredicateIndex = 11;
 
         return new RuleDefinition.Composite(SearchMovieInstance(
             new Parameter.Reference(idIndex),
@@ -121,7 +123,7 @@ public static class Rules
             new Parameter.Reference(countryIndex),
             new Parameter.Reference(actorsIndex),
             new Parameter.Reference(directorsIndex),
-            new Parameter.Reference(genresIndex)
+            new Parameter.Reference(genresPredicateIndex)
         ), new List<RuleDefinition.Instance>
         {
             MovieRuleInstance(
@@ -142,6 +144,10 @@ public static class Rules
                 new Parameter.Reference(yearRangeIndex),
                 new Parameter.Reference(yearIndex)
             ),
+            GenrePredicateInstance(
+                new Parameter.Reference(genresPredicateIndex),
+                new Parameter.Reference(genresIndex)
+                ),
             RatingRangeInstance(
                 new Parameter.Reference(ratingRangeIndex),
                 new Parameter.Reference(ratingIndex)),
@@ -158,8 +164,18 @@ public static class Rules
         .AddParameter(Parameters.Country, country)
         .AddParameter(Parameters.Actors, actors)
         .AddParameter(Parameters.Directors, directors)
-        .AddParameter(Parameters.Genres, genres)
+        .AddParameter(GenrePredicateRule, genres)
         .Build());
 
+    #endregion
+    #region Genre Definition
+    public static RuleDefinition.Instance GenrePredicateDefinition(string name, HashSet<string> values) =>
+        GenrePredicateInstance(new Parameter.SingleValue(name), new Parameter.MultipleValues(values));
+
+    public static RuleDefinition.Instance GenrePredicateInstance(Parameter name, Parameter value) => new(GenrePredicateRule,
+        new ParameterList.Builder()
+            .AddParameter(Parameters.Name, name)
+            .AddParameter(Parameters.Value, value)
+            .Build());
     #endregion
 }
