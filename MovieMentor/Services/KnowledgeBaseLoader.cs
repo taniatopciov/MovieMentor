@@ -20,13 +20,21 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
     private static readonly PredicateRule<string> GenrePredicateRule =
         new PredicateRule<string>.Builder(Rules.GenrePredicateRule, "Relax and feel good (Comedy, Romance, Animation)")
             .AddChoice("Let your imagination run wild (Fantasy, Sci-fi)",
-                genre => genre.Equals("Fantasy", StringComparison.OrdinalIgnoreCase) || genre.Equals("Sci-fi", StringComparison.OrdinalIgnoreCase))
+                genre => genre.Equals("Fantasy", StringComparison.OrdinalIgnoreCase) ||
+                         genre.Equals("Sci-fi", StringComparison.OrdinalIgnoreCase))
             .AddChoice("Get ready for suspense and anxiety (Horror, Crime, Thriller, Mystery)",
-                genre => genre.Equals("Horror", StringComparison.OrdinalIgnoreCase) || genre.Equals("Crime", StringComparison.OrdinalIgnoreCase) || genre.Equals("Thriller", StringComparison.OrdinalIgnoreCase) || genre.Equals("Mystery", StringComparison.OrdinalIgnoreCase))
+                genre => genre.Equals("Horror", StringComparison.OrdinalIgnoreCase) ||
+                         genre.Equals("Crime", StringComparison.OrdinalIgnoreCase) ||
+                         genre.Equals("Thriller", StringComparison.OrdinalIgnoreCase) ||
+                         genre.Equals("Mystery", StringComparison.OrdinalIgnoreCase))
             .AddChoice("Keep in touch with real life (Biography, Documentary)",
-                genre => genre.Equals("Biography", StringComparison.OrdinalIgnoreCase) || genre.Equals("Documentary", StringComparison.OrdinalIgnoreCase))
+                genre => genre.Equals("Biography", StringComparison.OrdinalIgnoreCase) ||
+                         genre.Equals("Documentary", StringComparison.OrdinalIgnoreCase))
             .AddChoice("Try to follow every thread of the story (Drama, Adventure, Action)",
-                genre => genre.Equals("Drama", StringComparison.OrdinalIgnoreCase) || genre.Equals("Adventure", StringComparison.OrdinalIgnoreCase) || genre.Equals("Action", StringComparison.OrdinalIgnoreCase) || genre.Equals("Western", StringComparison.OrdinalIgnoreCase))
+                genre => genre.Equals("Drama", StringComparison.OrdinalIgnoreCase) ||
+                         genre.Equals("Adventure", StringComparison.OrdinalIgnoreCase) ||
+                         genre.Equals("Action", StringComparison.OrdinalIgnoreCase) ||
+                         genre.Equals("Western", StringComparison.OrdinalIgnoreCase))
             .Build();
 
     private static readonly PredicateRule<int> DurationPredicateRule =
@@ -38,7 +46,7 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
     private static readonly PredicateRule<int> YearPredicateRule =
         new PredicateRule<int>.Builder(Rules.YearRangeRule, "2020s")
             .AddChoice("Released before the 80s", y => y is < 1980)
-            .AddChoice("80s",y => y is >= 1980 and < 1990 )
+            .AddChoice("80s", y => y is >= 1980 and < 1990)
             .AddChoice("90s", y => y is >= 1990 and < 2000)
             .AddChoice("2000s", y => y is >= 2000 and < 2010)
             .AddChoice("2010s", y => y is >= 2010 and < 2020)
@@ -62,7 +70,7 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
     {
         return new List<ChoiceDto>
         {
-            new(nameof(ValueType.Multiple), GenreChoice, false, GenrePredicateRule.GetLabels()),
+            new(nameof(ValueType.Single), GenreChoice, false, GenrePredicateRule.GetLabels()),
             new(nameof(ValueType.Multiple), DirectorChoice, true, _movieContext.Directors.Select(d => d.Name).ToList()),
             new(nameof(ValueType.Multiple), ActorsChoice, true, _movieContext.Actors.Select(a => a.Name).ToList()),
             new(nameof(ValueType.Single), DurationChoice, true, DurationPredicateRule.GetLabels()),
@@ -125,7 +133,9 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
 
     private static int AddDurationRange(ICollection<RuleDefinition> definitions, int value)
     {
-        if (definitions.Any(d => d.ParametersList[value.ToString()] != null))
+        if (definitions.Any(d =>
+                d.ParametersList["Value"] is Parameter.SingleValue singleValue &&
+                singleValue.Value == value.ToString()))
         {
             return value;
         }
@@ -138,7 +148,9 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
 
     private static int AddYearRange(ICollection<RuleDefinition> definitions, int value)
     {
-        if (definitions.Any(d => d.ParametersList[value.ToString()] != null))
+        if (definitions.Any(d =>
+                d.ParametersList["Value"] is Parameter.SingleValue singleValue &&
+                singleValue.Value == value.ToString()))
         {
             return value;
         }
@@ -151,7 +163,9 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
 
     private static string AddRatingRange(ICollection<RuleDefinition> definitions, string value)
     {
-        if (definitions.Any(d => d.ParametersList[value] != null))
+        if (definitions.Any(d =>
+                d.ParametersList["Value"] is Parameter.SingleValue singleValue &&
+                singleValue.Value == value))
         {
             return value;
         }
@@ -169,13 +183,15 @@ public class KnowledgeBaseLoader : IKnowledgeBaseLoader
 
     private static string AddGenrePredicate(ICollection<RuleDefinition> definitions, string value)
     {
-        if (definitions.Any(d => d.ParametersList[value] != null))
+        if (definitions.Any(d =>
+                d.ParametersList["Value"] is Parameter.MultipleValues singleValue &&
+                singleValue.Values.Contains(value)))
         {
             return value;
         }
 
         var label = GenrePredicateRule.Evaluate(value);
-        definitions.Add(Rules.GenrePredicateDefinition(label, new HashSet<string>{value}));
+        definitions.Add(Rules.GenrePredicateDefinition(label, new HashSet<string> { value }));
 
         return value;
     }

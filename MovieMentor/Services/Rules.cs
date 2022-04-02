@@ -147,7 +147,7 @@ public static class Rules
             GenrePredicateInstance(
                 new Parameter.Reference(genresPredicateIndex),
                 new Parameter.Reference(genresIndex)
-                ),
+            ),
             RatingRangeInstance(
                 new Parameter.Reference(ratingRangeIndex),
                 new Parameter.Reference(ratingIndex)),
@@ -168,14 +168,18 @@ public static class Rules
         .Build());
 
     #endregion
+
     #region Genre Definition
+
     public static RuleDefinition.Instance GenrePredicateDefinition(string name, HashSet<string> values) =>
         GenrePredicateInstance(new Parameter.SingleValue(name), new Parameter.MultipleValues(values));
 
-    public static RuleDefinition.Instance GenrePredicateInstance(Parameter name, Parameter value) => new(GenrePredicateRule,
+    public static RuleDefinition.Instance GenrePredicateInstance(Parameter name, Parameter value) => new(
+        GenrePredicateRule,
         new ParameterList.Builder()
             .AddParameter(Parameters.Name, name)
             .AddParameter(Parameters.Value, value)
             .Build());
+
     #endregion
 }
