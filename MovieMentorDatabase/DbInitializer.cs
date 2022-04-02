@@ -1,7 +1,9 @@
 ﻿using System.Globalization;
+using System.Web;
 using MovieMentorCore.Data;
 using MovieMentorDatabase.DAL;
 using CsvHelper;
+using Newtonsoft.Json;
 
 namespace MovieMentorDatabase;
 
@@ -21,6 +23,7 @@ public static class DbInitializer
         Dictionary<string, Actor> actorDict = new();
         Dictionary<string, Director> directorDict = new();
         Dictionary<string, Country> countryDict = new();
+        HttpClient client = new HttpClient();
 
         using (var streamReader = new StreamReader(@"MoviesData\SEMovies.csv"))
         {
@@ -55,6 +58,18 @@ public static class DbInitializer
                         countryDict.Add(record.Country, country);
                     }
 
+                    var link = record.Link.Remove(record.Link.Length - 1, 1);
+                    var movieId = link.Split('/').Last();
+                    
+                    var response = await client.GetAsync("https://imdb-api.com/en/API/Title/k_7pclxom2/" + movieId);
+                    string json = await response.Content.ReadAsStringAsync();
+                    dynamic data = JsonConvert.DeserializeObject(json);
+                    
+                    var imageLink = (string)data.image;
+                    var description = (string)data.plot;
+                    
+                    
+                    
                     var movie = new Movie
                     {
                         Title = record.Name,
@@ -65,7 +80,9 @@ public static class DbInitializer
                         Year = record.Year,
                         Genres = new List<Genre> {genre},
                         Rating = record.Score.ToString(),
-                        Link = record.Link
+                        Link = record.Link,
+                        ImageLink = imageLink,
+                        Description = description
                     };
 
                     context.Movies.Add(movie);
