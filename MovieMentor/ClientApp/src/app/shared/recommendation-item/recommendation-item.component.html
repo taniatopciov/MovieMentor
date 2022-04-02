@@ -8,9 +8,9 @@
     </mat-panel-description>
   </mat-expansion-panel-header>
   <div fxLayout="row">
-    <div fxLayout="column" fxLayoutAlign="space-around center">
+    <div fxLayout="column" fxLayoutAlign="start center">
       <img class="image" [src]="movieData.imageLink" alt="Movie Image">
-      <a mat-stroked-button [href]="movieData.link" target="_blank">More Details</a>
+      <a class="more-det" mat-stroked-button [href]="movieData.link" target="_blank">More Details</a>
     </div>
     <div fxFlex fxLayout="column" fxLayoutAlign="space-around start">
       <div class="prop-div" fxLayout="row" fxLayoutAlign="start center">
