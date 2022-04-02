@@ -8,4 +8,7 @@ export default interface Movie {
   duration: number;
   country: string;
   rating: string;
+  link: string;
+  imageLink: string;
+  description: string;
 }

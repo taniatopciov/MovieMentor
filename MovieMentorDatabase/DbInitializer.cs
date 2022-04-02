@@ -65,8 +65,8 @@ public static class DbInitializer
                     string json = await response.Content.ReadAsStringAsync();
                     dynamic data = JsonConvert.DeserializeObject(json);
                     
-                    var imageLink = (string)data.image;
-                    var description = (string)data.plot;
+                    var imageLink = (string)data.image ?? "";
+                    var description = (string)data.plot ?? "";
                     
                     
                     
