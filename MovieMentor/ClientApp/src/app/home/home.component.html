@@ -1,11 +1,34 @@
 <mat-card fxLayout="column" fxLayoutAlign="space-between start">
   <mat-stepper class="stp" labelPosition="bottom" linear #stepper>
     <mat-step *ngFor="let tag of tags; let i = index;" [optional]="tag.optional">
-      <ng-template matStepLabel>{{tag.name}}</ng-template>
-      <multiple-selection-list *ngIf="tag.type === 'Multiple'" [listData]="tag.values"
-                               (updateSelectedListItem)="onUpdateSelectedMultipleItems(tag.name, $event)"></multiple-selection-list>
-      <single-selection-list *ngIf="tag.type === 'Single'" [listData]="tag.values"
-                             (updateSelectedListItem)="onUpdateSelectedSingleItem(tag.name, $event)"></single-selection-list>
+      <div class="div-height" *ngIf="tag.values.length > 8">
+        <mat-form-field appearance="standard" [color]="'accent'" class="mff">
+          <mat-label>Filter</mat-label>
+          <input #myfilter matInput placeholder="Option">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <ng-template matStepLabel>{{tag.name}}</ng-template>
+        <multiple-selection-list style="height: 100%" *ngIf="tag.type === 'Multiple'"
+                                 [listData]="filterValues(tag.values, myfilter.value)"
+                                 (updateSelectedListItem)="onUpdateSelectedMultipleItems(tag.name, $event)"></multiple-selection-list>
+        <single-selection-list *ngIf="tag.type === 'Single'" [listData]="filterValues(tag.values, myfilter.value)"
+                               (updateSelectedListItem)="onUpdateSelectedSingleItem(tag.name, $event)"></single-selection-list>
+        <div class="selonum" *ngIf="tag.type === 'Multiple'">
+          Options selected: {{options.get(tag.name)?.length ?? 0}}
+        </div>
+      </div>
+
+      <div class="div-height" *ngIf="tag.values.length <= 8">
+        <ng-template matStepLabel>{{tag.name}}</ng-template>
+        <multiple-selection-list style="height: 100%" *ngIf="tag.type === 'Multiple'" [listData]="tag.values"
+                                 (updateSelectedListItem)="onUpdateSelectedMultipleItems(tag.name, $event)"></multiple-selection-list>
+        <single-selection-list *ngIf="tag.type === 'Single'" [listData]="tag.values"
+                               (updateSelectedListItem)="onUpdateSelectedSingleItem(tag.name, $event)"></single-selection-list>
+        <div class="selonum" *ngIf="tag.type === 'Multiple'">
+          Options selected: {{options.get(tag.name)?.length ?? 0}}
+        </div>
+      </div>
     </mat-step>
 
     <mat-step>
@@ -18,6 +41,7 @@
         <h2 class="no-movies" *ngIf="!spin && movies.length == 0">Could not find movies with chosen properties</h2>
       </div>
     </mat-step>
+
   </mat-stepper>
   <div class="step-buttons">
     <button *ngIf="stepper.selectedIndex > 0" class="back-button" mat-raised-button color="primary"

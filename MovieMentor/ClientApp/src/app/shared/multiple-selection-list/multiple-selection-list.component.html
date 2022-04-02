@@ -1,5 +1,7 @@
-<mat-selection-list>
-  <mat-list-option checkboxPosition="before" *ngFor="let option of listData" (click)="selectItem(option)">
+<mat-selection-list class="msl">
+  <mat-list-option *ngFor="let option of listData" [value]="option"
+                   [selected]="selectedOptions.indexOf(option) >= 0" checkboxPosition="before"
+                   (click)="selectItem(option)">
     {{option}}
   </mat-list-option>
 </mat-selection-list>

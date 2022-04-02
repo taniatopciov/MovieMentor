@@ -51,7 +51,7 @@ export class HomeComponent implements OnInit {
   onGetRecommendationButtonClick() {
     this.spin = true;
     this.movies = [];
-    
+
     this.moviesService.getRecommendations(this.createOptionsObject()).subscribe(data => {
       this.movies = data;
       this.spin = false;
@@ -72,5 +72,13 @@ export class HomeComponent implements OnInit {
     }
 
     return !this.options.has(tag.name) || this.options.get(tag.name)?.length == 0;
+  }
+
+  filterValues(values: string[], filter: string) {
+    if (!filter) {
+      return values;
+    }
+
+    return values.filter(value => value.toLowerCase().includes(filter.toLowerCase()));
   }
 }
