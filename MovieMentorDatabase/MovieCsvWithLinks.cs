@@ -1,6 +1,6 @@
 ﻿namespace MovieMentorDatabase;
 
-public class MovieCsv
+public class MovieCsvWithLinks
 {
     public string Name { get; set; }
     public string Genre { get; set; }
@@ -11,4 +11,6 @@ public class MovieCsv
     public string Country { get; set; }
     public int Duration { get; set; }
     public string Link { get; set; }
+    public string ImageLink { get; set; }
+    public string Description { get; set; }
 }

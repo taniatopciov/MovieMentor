@@ -31,7 +31,7 @@ public static class DbInitializer
             {
                 csvReader.Context.RegisterClassMap<MovieMap>();
                 var records = csvReader.GetRecords<MovieCsv>().ToList();
-
+                
                 foreach (var record in records)
                 {
                     if (!genreDict.TryGetValue(record.Genre, out var genre))
@@ -39,19 +39,19 @@ public static class DbInitializer
                         genre = new Genre {Name = record.Genre};
                         genreDict.Add(record.Genre, genre);
                     }
-
+                    
                     if (!actorDict.TryGetValue(record.Actor, out var actor))
                     {
                         actor = new Actor {Name = record.Actor};
                         actorDict.Add(record.Actor, actor);
                     }
-
+                    
                     if (!directorDict.TryGetValue(record.Director, out var director))
                     {
                         director = new Director {Name = record.Director};
                         directorDict.Add(record.Director, director);
                     }
-
+                    
                     if (!countryDict.TryGetValue(record.Country, out var country))
                     {
                         country = new Country {Name = record.Country};
@@ -68,8 +68,6 @@ public static class DbInitializer
                     var imageLink = (string)data.image ?? "";
                     var description = (string)data.plot ?? "";
                     
-                    
-                    
                     var movie = new Movie
                     {
                         Title = record.Name,
@@ -84,7 +82,7 @@ public static class DbInitializer
                         ImageLink = imageLink,
                         Description = description
                     };
-
+                    
                     context.Movies.Add(movie);
                 }
 

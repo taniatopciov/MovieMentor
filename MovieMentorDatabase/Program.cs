@@ -19,7 +19,8 @@ try
     // populate DB
 
     // await movieContext.Database.EnsureDeletedAsync();
-    await DbInitializer.Initialize(movieContext);
+    // await DbInitializer.Initialize(movieContext);
+    await DbInitializerFromCsv.Initialize(movieContext);
 
     Console.WriteLine("Done.");
 }

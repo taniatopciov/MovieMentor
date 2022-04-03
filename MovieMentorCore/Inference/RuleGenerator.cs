@@ -29,8 +29,6 @@ public class RuleGenerator
             return new List<ParameterList>();
         }
 
-        // later rules overloading
-        // definitions = definitions.Where(r => r.ParameterCount == parameters.Count).ToList();
         if (definitions.Count == 0 || parameterList.Count == 0)
         {
             return new List<ParameterList>();

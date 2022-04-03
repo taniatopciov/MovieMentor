@@ -1,6 +1,4 @@
-﻿using CsvHelper;
-using CsvHelper.Configuration;
-using MovieMentorCore.Data;
+﻿using CsvHelper.Configuration;
 
 namespace MovieMentorDatabase;
 
